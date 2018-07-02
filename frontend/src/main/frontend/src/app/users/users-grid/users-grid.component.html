@@ -1,0 +1,72 @@
+<div style="margin: 0px 40px" *ngIf="pageData" >
+  <div class="row user-grid-form">
+    <div class="col-xl-3">
+        <label for="">Show </label>
+        <select style="display:inline" class="form-control col-xl-2" name="pageSize" id="pageSize" 
+          [(ngModel)]="selectedPageSize" (change)="changePageSize()">
+            <option 
+              *ngFor="let pageSize of pageSizes" 
+              [ngValue]="pageSize"          
+              >{{pageSize}}
+            </option>
+        </select>
+        <label for=""> entries</label>
+    </div>
+    <div class="offset-xl-6 col-xl-3">
+      <input type="text"
+        class="form-control"
+        placeholder="Search User here.."
+        [(ngModel)]="searchUserText"
+        (keyup)="searchUser($event.target.value)"
+      >
+    </div>
+  </div>  
+  <div class="row" *ngIf="!noUserInfo">
+    <div class="col-xl-12">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>User Name</th>
+            <th>e-mail</th>
+            <th>Date Created</th>
+            <th>Is Reset Requested</th>
+            <th>Approve Request</th>
+            <th>Is Admin</th>
+            <th>Is Active</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of pageData">
+            <td>{{user.userId}}</td>
+            <td>{{user.userName}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.creationDate}}</td>
+            <td><input type="checkbox" [checked]="user.isResetRequested"></td>
+            <td><input type="checkbox" [checked]="user.approveRequest"></td>
+            <td><input type="checkbox" [checked]="user.isAdmin"></td>
+            <td><input type="checkbox" [checked]="user.isActive"></td>
+            <td>
+              <button class="btn btn-success">Save</button>
+              <button class="btn btn-success">Cancel</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row"  *ngIf="!noUserInfo">
+    <div class="col-lg-6">Showing {{pageData.length}} of {{users.length}} entries</div>
+    <div class="col-lg-6">
+      <div class="float-right">
+        <app-pagination [pageSpecificData]="pageSpecificUsers"></app-pagination>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="noUserInfo" class="row">
+  <div class="offset-xl-4">
+      <h2>No users found..</h2>
+  </div>
+</div>

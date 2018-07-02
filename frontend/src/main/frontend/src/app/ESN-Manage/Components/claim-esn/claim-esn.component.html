@@ -1,0 +1,23 @@
+
+<div class="borderClass">
+  <div class="form-inline row" style="margin: 10px;">
+      <div class="form-group col-sm-4">
+        <label class="align" for="Device">Select Device:</label>
+        <select name="deviceSelected" style="width: 450px" class="align form-control">
+            <option value="Iphone 6 64GB Gold">Iphone 6 64GB Gold</option>
+            <option value="Iphone 10 128GB RoseGold">Iphone 10 128GB RoseGold</option>
+            <option value="Iphone 8 128GB Silver">Iphone 8 128GB Silver</option>
+          </select>
+      </div>
+      <div class="form-group col-sm-2">
+          <label class="align" style="width: 100px" for="ESN">No. of ESN:</label>
+          <select class="form-control" name="noOfEsns" style="width: 100px">
+            <option value="1">1</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
+      </div>
+      
+      <button type="submit" class="col-sm-2 btn btn-primary align" (click)="claimEsn()">Claim ESN</button>
+    </div>
+</div>

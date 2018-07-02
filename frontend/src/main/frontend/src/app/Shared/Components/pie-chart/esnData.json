@@ -1,0 +1,11 @@
+{
+   "data":[
+      {
+         "lastImportedESN":"17/04/2018",
+         "lastValidESN":"18/04/2018",
+         "pulledESN":1000,
+         "validESNCount":650,
+         "thresholdESN":100
+      }
+   ]
+}

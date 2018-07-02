@@ -1,0 +1,19 @@
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover">
+    
+  <tbody>
+    <tr *ngFor="let esn of esns">
+      <td>{{ esn.ASSIGNED }}</td>
+      <td>{{ esn.ESN }}</td>
+      <td>{{ esn.ESN_HEX }}</td>
+      <td>{{ esn.MODEL_NUMBER }}</td>
+      <td>{{ esn.MODEL_NAME }}</td>
+      <td>{{ esn.MANF_NAME }}</td>
+      <td>{{ esn.ICC_ID }}</td>
+      <td>{{ esn.IMEI }}</td>
+      <td>{{ esn.LTE_SKU }}</td>
+      <td>{{ esn.LTE_IMSI }}</td>
+    </tr>
+  </tbody>
+  </table>
+
+ 

@@ -1,0 +1,28 @@
+<div class="row left-align">
+        <div clas= "col-md-3" style="margin-top:6em">
+          <h4><strong>ESN availability in system</strong></h4>
+        </div>
+        <div class= "col-md-3">
+            <div style="display: block">
+                <canvas baseChart
+                        [data]="pieChartData"
+                        [labels]="pieChartLabels"
+                        [chartType]="pieChartType"
+                        (chartHover)="chartHovered($event)"
+                        (chartClick)="chartClicked($event)"></canvas>
+              </div>
+        </div>
+        <div class= "col-md-3 buttonAlignment">
+          <p>ESN last Imported on: <strong>{{esnData.data[0].lastImportedESN}}</strong> </p>
+          <p>ESN last Validated on: <strong>{{esnData.data[0].lastValidESN}}</strong></p>
+          <p>Number of ESN last pulled: <strong>{{esnData.data[0].pulledESN}}</strong></p>
+          <p>Available Valid ESN: <strong>{{esnData.data[0].validESNCount}}</strong></p>
+          <p>Min ESN Threshold: <strong>{{esnData.data[0].thresholdESN}}</strong></p>
+        </div>
+        <div class="col-md-3 buttonAlignment">
+            <button class="btn btn-primary margin-button" [routerLink]="['/ManageUsers']" routerLinkActive="active">Manage Users</button><br>
+            <button class="btn btn-primary margin-button" (click)="getDataImport()"><a class="linkStyle">Import ESNs</a></button><br>
+            <button class="btn btn-primary margin-button"  [routerLink]="['/Validate']" routerLinkActive="active">Validate</button>
+        </div>
+</div>
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>

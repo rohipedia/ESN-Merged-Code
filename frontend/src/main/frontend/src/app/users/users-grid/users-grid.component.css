@@ -1,0 +1,11 @@
+td > a {
+    color: white;
+}
+
+td > a:hover { 
+    color: white;
+}
+
+.user-grid-form {
+    margin: 15px 0px;
+}

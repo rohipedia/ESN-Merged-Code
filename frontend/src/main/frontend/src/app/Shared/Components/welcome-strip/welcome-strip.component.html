@@ -1,0 +1,8 @@
+
+<div class="borderClass">
+  <h4>Welcome <strong>{{authData1.authData[0].username}}</strong>, your Last Login was :- <strong>{{authData1.authData[0].lastLogin}}</strong></h4>
+  <h6>You have claimed : <strong>{{authData1.authData[0].claimedESN}}</strong> ESN last time out of which <strong>{{authData1.authData[0].validESN_USER}}</strong> ESN  are still valid</h6>
+</div>
+<app-piechart *ngIf="isAdminMode"></app-piechart>
+<app-claim-esn></app-claim-esn>
+<app-esn-grid [isAdminMode]="isAdminMode"></app-esn-grid>

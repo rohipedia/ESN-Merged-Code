@@ -1,0 +1,37 @@
+<div class="col-md-3 align">
+        <fieldset class="the-fieldset">
+                <legend align="center" class="the-legend"><h3>REGISTER</h3></legend>
+    <form #myform="ngForm" (ngSubmit)="registration(email.value,password.value)">
+        <div class="form-group">
+
+            <label for="userName">User Name</label>
+            <input ngModel placeholder="Username should be 5-10 characters" id="userName" type="text" class="form-control" name="userName" required minlength="5" maxlength="10" #username="ngModel">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input ngModel placeholder="Password 8-12 characters" id="password" type="password" class="form-control" name="password" required minlength="8" maxlength="12" #password="ngModel">
+        </div>
+
+        <div class="form-group">
+            <label for="cpassword">Confirm Password</label>
+            <input ngModel placeholder="Confirm password same as above" id="cpassword" type="password" class="form-control" name="cpassword" required validateEqual="password" #cpassword="ngModel">
+
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input ngModel placeholder="Email eg. abc@xyz.com" id="email" type="text" class="form-control" name="email" required pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$" #email="ngModel">
+
+        </div>
+
+        <div class="form-group">
+            <label for="admincheck">Is Admin</label>
+            <input type="checkbox">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add User</button>
+        <button type="reset" class="btn btn-primary">Clear</button>
+    </form>
+</fieldset>
+</div>

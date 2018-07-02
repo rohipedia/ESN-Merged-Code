@@ -1,0 +1,65 @@
+<div *ngIf="pageSpecificEsns.length > 0">
+  <div style="margin: 0px 40px">
+    <div class="row user-grid-form">
+      <div class="col-xl-3">
+          <label for="">Show </label>
+          <select style="display:inline" class="form-control col-xl-2" name="pageSize" id="pageSize" 
+            [(ngModel)]="selectedPageSize" (change)="changePageSize()">
+              <option 
+                *ngFor="let pageSize of pageSizes" 
+                [ngValue]="pageSize"          
+                >{{pageSize}}
+              </option>
+          </select>
+          <label for=""> entries</label>
+      </div>
+      <div class="offset-xl-6 col-xl-3">
+        <input type="text"
+          class="form-control"
+          placeholder="Search User here.."
+          [(ngModel)]="searchUserText"
+          (keyup)="searchUser($event.target.value)"
+        >
+      </div>
+    </div>  
+    <div class="row" *ngIf="!noEsnInfo">
+      <div class="col-xl-12">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>ESN Validating User</th>
+              <th>State</th>
+              <th>Date Validating</th>
+              <th>TotalESNValidated</th>
+              <th>ValidESNNo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let esn of currentPageEsns">
+                <td>{{ esn.validationJobId }}</td>
+                <td>{{ esn.userForActivity.userName }}</td>
+                <td>{{ esn.state }}</td>
+                <td>{{ esn.dateForActivity | date }}</td>
+                <td>{{ esn.totalEsnValidated }}</td>
+                <td>{{ esn.validEsnCount }}</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-6">Showing {{currentPageEsns.length}} of {{esns.length}} entries</div>
+      <div class="col-lg-6">
+        <div class="float-right">
+          <app-pagination [pageSpecificData]="pageSpecificEsns"></app-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row" *ngIf="noEsnInfo">
+  <div class="offset-xl-4">
+      <h2>No esns found..</h2>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+<div class="alert alert-success" ng-show="showAlert">
+    <button type="button" class="close" data-ng-click="switchBool('showSuccessAlert')">×</button> 
+<strong>Done!</strong> {{successMessage}}</div>
+<div class="alert alert-danger" ng-hide="showAlert">
+    <button type="button" class="close" data-ng-click="switchBool('showSuccessAlert')">×</button> 
+    <strong>Oops!</strong> {{failureMessage}}</div>
+
+

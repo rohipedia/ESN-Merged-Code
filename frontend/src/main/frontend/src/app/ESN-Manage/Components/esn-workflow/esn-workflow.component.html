@@ -1,0 +1,21 @@
+<div class="borderClass"> 
+<div class="modal-body">
+  <div class="row">
+  <div class="row-fluid col-md-9 alignWorkflow">
+<div class="btn  btn-xl" >Running</div>
+<hr class="horizontal"/>
+<div class="btn  btn-xl" >Stopped</div>
+<hr class="horizontal"/>
+<div class="btn   btn-xl" >Failed</div>
+<hr class="horizontal"/>
+<div class="btn  btn-xl" >Completed</div>
+<button type="button" class="btn  btn-xl1" (click)="refresh()">Refresh</button>
+</div>
+<div class="col-md-1"></div>
+<div class="col-md-2">
+    <button class="btn btn-primary margin-button">Stop Validation</button><br>
+    <button class="btn btn-primary margin-button" (click)="triggerValidation()">Trigger Validation</button>
+</div>
+</div>
+</div>
+</div>
