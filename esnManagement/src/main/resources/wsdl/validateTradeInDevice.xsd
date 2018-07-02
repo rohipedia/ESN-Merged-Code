@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 rel. 2 (x64) (http://www.altova.com) by Stephen.J.Heichelheim@sprint.com (SPRINT) -->
+<xs:schema xmlns:tns="http://integration.sprint.com/interfaces/validateTradeInDevice/v1/validateTradeInDevice.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://integration.sprint.com/interfaces/validateTradeInDevice/v1/validateTradeInDevice.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.8">
+	<!-- Date              Author                   Version     Description                                                                                        Rel                          SR# -->
+	<!--04/18/2015   Lais Gasparini	    1.0             iPhone Forever Initial Draft                                                               GBL16.2              PJ019964 Epic 494 iPhone Forever-->
+	<!--05/09/2016   Lais Gasparini        1.1             Renamed field foreverOfferCode to offerGroupCode in the request. Added field retailLocationId to the request. Renamed field foreignDeviceInd to nonSprintDeviceInd in the response Added fields giveBackStatusInd, deviceEligibilityInd to the sprintDeviceInfo structure in the response. Removed field tradeInEligibilityMessage and added structure  tradeInEligibilityStatusList to the tradeInEligibilityInfo structure in the response.     GBL16.2      PJ019964 Epic 494 iPhone Forever
+-->
+	<!--05/09/2016  Steve Heichelheim   1.1             Standardize                 GBL16.2      PJ019964          -->
+	<!--05/25/2016  Steve Heichelheim   1.2             Standardize  (modified field tradeInEligibilityInd from String(15) to Boolean)             GBL16.2      PJ019964          -->
+	<!--05/30/2016  Lais Gasparini         1.3             Added field offerItemId and strcture offerGroupList to the request. Added fields bestOfferGroupCode and tradeInValidationMessage to the response GBL16.2      PJ019964          -->
+	<!--05/31/2016  Steve Heichelheim 1.3    Standardize                                                                GBL16.2      PJ019964          -->
+	<!--06/03/2016  Lais Gasparini         1.4             Moved field offerItemId into offerGroupInfo structure.
+Added offerSaleType field into offerGroupInfo structure in the request
+Removed fields deviceLostStolenInd, giveBackStatusInd and deviceEligibilityInd from sprintDeviceInfo structure in the request.
+Added accountTypeInfo structure and orderType field to the request.
+Added field bestOfferItemId to the response.
+Changed deviceInfo structure in the response from choice to conditional.
+Changed tradeInEligibilityInfo structure in the response from choice to required.
+    GBL16.2      PJ019964          -->
+	<!--06/06/2016 Steve Heichelheim  1.4   Standardize                                                                    GBL16.2      PJ019964          -->
+	<!--06/07/2016 Lais Gasparini        1.5   Moved accountTypeInfo structure to newAccountInfo. Moved subscriberId, mdn and ban to existingAccountInfo and removed identificationInfo.     GBL16.2      PJ019964          -->
+	<!--06/09/2016 Lais Gasparini        1.5   Moved accountTypeInfo to accountInfo structure. Changed corpId from optional to required in a Choice structure.    GBL16.2      PJ019964          -->
+	<!--06/20/2016 Lais Gasparini        1.6   Added new value, "appleCheckFailedInd", to tradeInValidationCheck field    GBL16.2      PJ019964          -->
+	<!--07/15/2016 Tracy Turner      1.7   Feat 22: Added support for multi line trade in devices    			Epic 494  PJ019964          -->
+	<!--08/29/2016 Tracy Turner      1.8   Feat 22: Added new optional field 'equipmentLineId' in the request and response.  FE sending multiple purchase devices should use this to track which response goes with which device.			Epic 494  PJ019964          -->
+	<!--10/05/2016 Lais Gasparini        1.8 Added salesChannelCode to the request                                     IM3749454 -->
+	<!--10/10/2016 Steve Heichelheim   1.8   Standardize                                                              PJ019964     IM3749454 -->
+	<!--      -->
+	<xs:element name="validateTradeInDevice" type="tns:ValidateTradeInDeviceRequestType"/>
+	<xs:element name="validateTradeInDeviceResponse" type="tns:ValidateTradeInDeviceResponseType"/>
+	<xs:complexType name="ValidateTradeInDeviceRequestType">
+		<xs:sequence>
+			<xs:element name="tradeInDeviceList" type="tns:MultiDeviceListType">
+				<xs:annotation>
+					<xs:documentation>List of potential trade in devices. Max number of occurences is configurable, initial value in the API is max of 5 devices</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="purchaseDeviceList" type="tns:PurchaseDeviceListType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>List of up to 5 devices targetted for purchase</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="salesChannelCode" type="tns:SalesChannelCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Sales channel code of the caller.
+Sales channel code is based on the dealer. i.e., a Web and RMS dealer using FDT will have different sales channels based on their dealer code though transaction comes from FDT.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ValidateTradeInDeviceResponseType">
+		<xs:sequence>
+			<xs:element name="tradeInResponseList" type="tns:TradeInResponseListType">
+				<xs:annotation>
+					<xs:documentation>List containing trade-in response(s) for each device sent . </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AccountInfoType">
+		<xs:choice>
+			<xs:element name="accountTypeInfo" type="tns:AccountTypeInfoType">
+				<xs:annotation>
+					<xs:documentation>Structure to provide Account Type and Account Sub Type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="newAccountInfo" type="tns:NewAccountInfoType">
+				<xs:annotation>
+					<xs:documentation>Structure containing new account information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="existingAccountInfo" type="tns:ExistingAccountInfoType">
+				<xs:annotation>
+					<xs:documentation>Structure containing existing account information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="AccountTypeInfoType">
+		<xs:sequence>
+			<xs:element name="accountType" type="tns:BillingAccountTypeCodeType">
+				<xs:annotation>
+					<xs:documentation>Account Type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="accountSubType" type="tns:BillingAccountSubTypeCodeType">
+				<xs:annotation>
+					<xs:documentation>Account Sub Type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConditionAnswerInfoType">
+		<xs:sequence>
+			<xs:element name="answerId" type="tns:AnswerIdentifierType">
+				<xs:annotation>
+					<xs:documentation>The unique answerId selected for the condition question </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConditionAnswerListType">
+		<xs:sequence>
+			<xs:element name="conditionAnswerInfo" type="tns:ConditionAnswerInfoType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>conditionAnswerInfo structure</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeviceInfoType">
+		<xs:choice>
+			<xs:element name="sprintDeviceInfo" type="tns:SprintDeviceInfoType">
+				<xs:annotation>
+					<xs:documentation>Structure containing information on a Sprint device</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="nonSprintDeviceInd" type="tns:ForeignFlagType">
+				<xs:annotation>
+					<xs:documentation>Indicates if device is a non-Sprint device.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="ExistingAccountInfoType">
+		<xs:choice>
+			<xs:element name="subscriberId" type="tns:SubscriberIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Subscriber Number to identify a BAN</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="mdn" type="tns:MobileDirectoryNumberStringType">
+				<xs:annotation>
+					<xs:documentation>One of the MDNs to identify a BAN</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ban" type="tns:BillingAccountNumberType">
+				<xs:annotation>
+					<xs:documentation>Billing account number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="NewAccountInfoType">
+		<xs:choice>
+			<xs:element name="customerTypeDesc" type="tns:CustomerTypeCodeType">
+				<xs:annotation>
+					<xs:documentation>Customer type to retrieve account type and subtype. Valid options:
+INDIVIDUAL
+BUSINESS
+CORPORATE_INDIVIDUAL
+CORPORATE_BUSINESS
+GOVERNMENT_INDIVIDUAL
+GOVERNMENT_BUSINESS</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="corpId" type="tns:CorporationIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Corporate or government id.  Should be provide if customer type is corporate or government.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="OfferGroupInfoType">
+		<xs:sequence>
+			<xs:element name="offerGroupCode" type="tns:OfferGroupCodeType">
+				<xs:annotation>
+					<xs:documentation>Code that identifies the offer group</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="offerSaleType" type="tns:ProcurementMethodCodeType">
+				<xs:annotation>
+					<xs:documentation>Type of sale for thie offer. Valid options:
+I - IB
+L - Lease</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OfferGroupListType">
+		<xs:sequence>
+			<xs:element name="offerGroupInfo" type="tns:OfferGroupInfoType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Structure containing offer group information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SprintDeviceInfoType">
+		<xs:sequence>
+			<xs:element name="itemId" type="tns:EquipmentItemIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Indicates the itemId (SKU) for the serialnumber provided in the request.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deviceDescription" type="tns:EquipmentItemDescriptionType">
+				<xs:annotation>
+					<xs:documentation>itemId (SKU) description.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="buybackProductId" type="tns:ProductIdentifierType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The unique product identifier in the back end system.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SingleDeviceInfoType">
+		<xs:sequence>
+			<xs:element name="serialNumber" type="tns:EquipmentSerialNumberStringType">
+				<xs:annotation>
+					<xs:documentation>The trade-in device serial number. This must consist only of alpha-numeric characters and be at least 5 characters in length</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tradeInInfo" type="tns:TradeInInfoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Structure containing trade-in information to determine if device is eligible for trade-in within the offer(s) provided. If populate this for a single line, do not populate multiLineTradeInList</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MultiDeviceListType">
+		<xs:sequence>
+			<xs:element name="tradeInDeviceInfo" type="tns:MultiDeviceInfoType" maxOccurs="99">
+				<xs:annotation>
+					<xs:documentation>Structure containing trade-in information to determine if devices are eligible for trade-in within the offer(s) provided. The upper max is 99, but the 'real' max number of devices is controlled within the API, will initially be set to 5</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MultiDeviceInfoType">
+		<xs:sequence>
+			<xs:element name="serialNumber" type="tns:EquipmentSerialNumberStringType">
+				<xs:annotation>
+					<xs:documentation>The trade-in device serial number. This must consist only of alpha-numeric characters and be at least 5 characters in length</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tradeInInfo" type="tns:TradeInInfoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>trade in structure</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TradeInEligibilityInfoType">
+		<xs:sequence>
+			<xs:element name="tradeInEligibilityInd" type="tns:EligibilityFlagType">
+				<xs:annotation>
+					<xs:documentation>Indicates if device is eligible for trade-in or not.
+If the conditions below are met, tradeInEligibilityInd will return true:
+- deviceLostStolenCheckInd is false
+- deviceGiveBackInd is false
+- openLoanLeaseCheckInd is false
+- appleLockedCheckInd is false
+- deviceEligibilityCheckInd is true
+ - bestOptionForOfferInd is true (or not applicable)
+Else tradeInEligibilityInd will return false</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tradeInEligibilityStatusList" type="tns:TradeInEligibilityStatusListType">
+				<xs:annotation>
+					<xs:documentation>List containing tradeInEligibilityStatusInfo structures.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bestOfferGroupCode" type="tns:OfferGroupCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Code that identifies the best offer group option for the customer (greatest discount).
+If the trade-in device is not valid or none of the offerGroupCodes sent in request are valid, this field will not be returned.  If the trade-in was sent in a group and was not part of the best combined offer/group selection, this will not be returned.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bestOfferItemId" type="tns:EquipmentItemIdentifierType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the itemId (SKU) of the device that will have the best discount applied for trade-in.
+If the trade-in device is not valid or none of the offerGroupCodes sent in request are valid, this field will not be returned. If the trade-in was sent in a group and was not part of the best combined offer/group selection, this will not be returned.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="equipmentLineId" type="tns:LineItemIdentifierType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the line number for the purchase device item and can be anywhere from 0-99. This was provided by the front end on the request.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TradeInEligibilityStatusInfoType">
+		<xs:sequence>
+			<xs:element name="tradeInValidationCheck" type="tns:ValidationRuleSetIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Indicates type of each validation. Valid values are:
+- deviceLostStolenCheckInd
+- deviceGiveBackInd
+- openLoanLeaseCheckInd
+- appleLockedCheckInd
+- appleCheckFailedInd
+- deviceEligibilityCheckInd
+ - bestOptionForOfferInd
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tradeInValidationCheckInd" type="tns:ValidationSuccessFlagType">
+				<xs:annotation>
+					<xs:documentation>Indicates the status of the corresponding validation check.
+
+- deviceLostStolenCheckInd:
+true: device is market as lost or stolen
+false: device is not market as lost or stolen
+
+- openLoanLeaseCheckInd:
+true: device is on an open lease/loan.
+false: device is not on an open lease/loan
+
+- deviceGiveBackInd:
+true: device is being used on a givaBack process.
+false: device is not being used on a giveback process.
+
+- appleLockedCheckInd:
+true: apple device is marked as locked
+false: apple device is not marked as locked
+
+- deviceEligibilityCheckInd:
+true: device is eligible for trade-in.
+false: device is not eligible for trade-in due to, for example, device condition.
+
+- bestOptionForOfferInd:
+(Conditional, for when multiple tradeins are sent, thius check happens last)
+true: device is eligible and is part of the best option for a combined offer (multiple devices)
+false: device is not part of the optimal grouping of tradein devices, and should not be selected for best offer
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tradeInValidationMessage" type="tns:MessageTextType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Message that contains information on the tradeInValidationCheckInd value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TradeInEligibilityStatusListType">
+		<xs:sequence>
+			<xs:element name="tradeInEligibilityStatusInfo" type="tns:TradeInEligibilityStatusInfoType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Structure containing trade-in eligibility status information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TradeInResponseListType">
+		<xs:sequence>
+			<xs:element name="tradeInResponseInfo" type="tns:TradeInResponseInfoType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Structure containing trade in response information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TradeInResponseInfoType">
+		<xs:sequence>
+			<xs:element name="serialNumber" type="tns:EquipmentSerialNumberStringType">
+				<xs:annotation>
+					<xs:documentation>A valid product serial number. This must consist only of alpha-numeric characters and be at least 5 characters in length</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deviceInfo" type="tns:DeviceInfoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Structure containing device information. This structure will be returned if only serialNumber field is sent in the request (ie a standalone device check with no offer information submitted)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tradeInEligibilityInfo" type="tns:TradeInEligibilityInfoType">
+				<xs:annotation>
+					<xs:documentation>Structure containing device eligibility information for trade-in.
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TradeInListType">
+		<xs:sequence/>
+	</xs:complexType>
+	<xs:complexType name="PurchaseDeviceListType">
+		<xs:sequence>
+			<xs:element name="purchaseDeviceInfo" type="tns:PurchaseDeviceInfoType" maxOccurs="99">
+				<xs:annotation>
+					<xs:documentation>purchase device structure.  Max number of occurences is configurable, although the upper max in the schema is 99, the initial value in the API is set to 5 devices</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TradeInInfoType">
+		<xs:sequence>
+			<xs:element name="buybackProductId" type="tns:ProductIdentifierType">
+				<xs:annotation>
+					<xs:documentation>The unique product identifier in the back end system of the trade-in device</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="conditionAnswerList" type="tns:ConditionAnswerListType">
+				<xs:annotation>
+					<xs:documentation>The list of answers for the condition questions</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PurchaseDeviceInfoType">
+		<xs:sequence>
+			<xs:element name="equipmentLineId" type="tns:LineItemIdentifierType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the line number for the equipment item and can be anywhere from 0-99. This is provided by the front end.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="itemId" type="tns:EquipmentItemIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Indicates the itemId (SKU) of the device the customer wants to purchase</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="offerGroupList" type="tns:OfferGroupListType">
+				<xs:annotation>
+					<xs:documentation>Structure containing the list of offer groups that require a trade-in device and are eligible for the customer. Required if tradeInList is populated</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="orderType" type="tns:OrderTypeCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Order Type. Valid options:
+NEW
+ADD_ON
+UPGRADE
+UPGRADE_EARLY</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="accountInfo" type="tns:AccountInfoType">
+				<xs:annotation>
+					<xs:documentation>Structure containing account information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="retailLocationId" type="tns:RetailStoreIdentifierIntegerType">
+				<xs:annotation>
+					<xs:documentation>The identifier of the retail location selling the device. Required if tradeInList is populated</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!---->
+	<!--Shared Simple Types-->
+	<xs:simpleType name="AnswerIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Answer Identifier is a unique identifier for an answer.  It can reference a fixed answer choice or a freeform answer.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="256"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BillingAccountSubTypeCodeType">
+		<xs:annotation>
+			<xs:documentation>Billing Account SubType Code further categorizes the Billing Account within the context of the assigned Billing Account Type Code used primarily for Customer segmentation in General Ledger reporting and collection treatment.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BillingAccountTypeCodeType">
+		<xs:annotation>
+			<xs:documentation>Billing Account Type Code identifies the account type of the BILLING ACCOUNT. It is used mainly for segregation of the G/L reporting and Collection treatment.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BillingAccountNumberType">
+		<xs:annotation>
+			<xs:documentation>Billing Account Number uniquely identifies an instance of Billing Account used to accrue charges for invoicing.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:totalDigits value="9"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ContractTypeCodeType">
+		<xs:annotation>
+			<xs:documentation>Contract Type Code identifies a type of contract.
+Example Values:  
+A - Upgrade, 
+B - Replacement, 
+C - New Equipment Purchases, 
+D - New Rate Plan, 
+L - Lease, 
+I - Installment Billing,
+INSTALLMENT_BILLING, 
+LEASE_BILLING</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CorporationIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Corporation Identifer uniquely identifies a corporate entity.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+			<xs:minLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CustomerTypeCodeType">
+		<xs:annotation>
+			<xs:documentation>Customer Type Code provides a mechanism for categorizing Customers within the context of various functionalities.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="25"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EligibilityFlagType">
+		<xs:annotation>
+			<xs:documentation>Eligibility Flag is a boolean flag to indicate if the account/party is eligible for a particular action or treatment.
+value values
+True - Eligible
+False - Not Eligible</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean"/>
+	</xs:simpleType>
+	<xs:simpleType name="EquipmentItemDescriptionType">
+		<xs:annotation>
+			<xs:documentation>Equipment Item Description is text describing an item of equipment.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="30"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EquipmentItemIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Equipment Item Identiifer is the item identifier of the equipment to be ordered should be authorized according to the dealer’s sales channel.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EquipmentSerialNumberStringType">
+		<xs:annotation>
+			<xs:documentation>Equipment Serial Number holds the identifier used by the device to communicate (broadcast) its identity to the wireless mobile network.  &#13;
+&#13;
+Network Device Identifier will contain one of the following: &#13;
+Electronic Serial Number (ESN); &#13;
+Mobile Equipment IDentifier (MEID);&#13;
+International Mobile Equipment Identfie (IMEI);&#13;
+Subscriber Identify Module (SIM).</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="5"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ForeignFlagType">
+		<xs:annotation>
+			<xs:documentation>Foreign Flag is a boolean indicator of whether the associated item is from a foreign country.
+true - the associated item is foreign
+false - the associated item is not foreign</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean"/>
+	</xs:simpleType>
+	<xs:simpleType name="MessageTextType">
+		<xs:annotation>
+			<xs:documentation>Message Text represents a natural language communication of information or a preassembled set of related data that should be communicated together.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="100"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MobileDirectoryNumberStringType">
+		<xs:annotation>
+			<xs:documentation>Mobile Directory Number (MDN) is the actual phone number one would dial to reach a specific mobile phone.
+Prior to Wireless Number Portability, MDN was the same number as the Mobile Identification Number (MIN) for many mobile phones. But now that MDNs can be ported (moved) to other carriers, MDN and MIN will be different for ported numbers.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="OfferGroupCodeType">
+		<xs:annotation>
+			<xs:documentation>Offer Group Code uniquely identifies an offer group.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="OrderTypeCodeType">
+		<xs:annotation>
+			<xs:documentation>Order Type Code designates the category of the ORDER.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="16"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ProcurementMethodCodeType">
+		<xs:annotation>
+			<xs:documentation>Procurement Method Code designates the method by which the associated item was procured.
+Valid Values Include:
+P - Purchase,
+R - Rental,
+L - Lease</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ProductIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Product Identifier is a code that uniquely idenfies and instance or group of items offered for sale to the Customer.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RetailStoreIdentifierIntegerType">
+		<xs:annotation>
+			<xs:documentation>Retail Store Identifer is the store ID passed from the retailer to inComm.  These are 4 to 6 characters in length sometimes padded with zeros.  Leading 0s should not be stripped off.&#13;
+(Examples: 001859, 1165, 0649)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="128"/>
+			<xs:minLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SalesChannelCodeType">
+		<xs:annotation>
+			<xs:documentation>Sales Channel Code designates a particular dealer sales channel.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SubscriberIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Subscriber Identifier is a string that uniquely identifies a subscriber.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+			<xs:minLength value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ValidationSuccessFlagType">
+		<xs:annotation>
+			<xs:documentation>Validation Success Flag is a boolean indicator of whether validation succeeded or failed.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean"/>
+	</xs:simpleType>
+	<xs:simpleType name="ValidationRuleSetIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Validation Rule Set Identifier uniquely identifies the valiation or rule set used.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="30"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!---->
+	<xs:simpleType name="LineItemIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Line Item Identifier uniquely identifies a line item of a particular document, record set, invoice, sale, or bill.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="99"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

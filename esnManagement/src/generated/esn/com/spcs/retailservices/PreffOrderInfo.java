@@ -1,0 +1,81 @@
+
+package esn.com.spcs.retailservices;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
+
+/**
+ * <p>Java class for PreffOrderInfo complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="PreffOrderInfo"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="transactionNumber" type="{http://www.w3.org/2001/XMLSchema}long"/&gt;
+ *         &lt;element name="saleAgentId" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "PreffOrderInfo", propOrder = {
+    "transactionNumber",
+    "saleAgentId"
+})
+public class PreffOrderInfo {
+
+    protected long transactionNumber;
+    @XmlElement(required = true)
+    protected String saleAgentId;
+
+    /**
+     * Gets the value of the transactionNumber property.
+     * 
+     */
+    public long getTransactionNumber() {
+        return transactionNumber;
+    }
+
+    /**
+     * Sets the value of the transactionNumber property.
+     * 
+     */
+    public void setTransactionNumber(long value) {
+        this.transactionNumber = value;
+    }
+
+    /**
+     * Gets the value of the saleAgentId property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSaleAgentId() {
+        return saleAgentId;
+    }
+
+    /**
+     * Sets the value of the saleAgentId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSaleAgentId(String value) {
+        this.saleAgentId = value;
+    }
+
+}

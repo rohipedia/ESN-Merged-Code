@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2016 rel. 2 (x64) (http://www.altova.com) by LEE VAN AALSBURG (LEE VAN AALSBURG) -->
+<xs:schema xmlns:tns="http://integration.sprint.com/interfaces/queryCompatibleSimKitInfo/v1/queryCompatibleSimKitInfo.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://integration.sprint.com/interfaces/queryCompatibleSimKitInfo/v1/queryCompatibleSimKitInfo.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<!-- Date              Author                   Version    Description                                                                                                                        Rel                                   SR# -->
+	<!--03/22/2017  Arun Singla               1.0         Initial Version  MID17.5.1 PJ021529 Epic 945 BYOD Compatibility-->
+	<!--03/28/2017  Steve Heichelheim    1.0         Standardize                                                                             MID17.5.1 PJ021529 Epic 945 BYOD Compatibility-->
+	<!---->
+	<xs:element name="queryCompatibleSimKitInfo" type="tns:QueryCompatibleSimKitInfoRequestType"/>
+	<xs:element name="queryCompatibleSimKitInfoResponse" type="tns:QueryCompatibleSimKitInfoResponseType"/>
+	<xs:complexType name="QueryCompatibleSimKitInfoRequestType">
+		<xs:sequence>
+			<xs:element name="deviceSerialNumber" type="tns:DeviceSerialNumberType">
+				<xs:annotation>
+					<xs:documentation>ESN/Mobile Equipment Identifier (MEID)/ MAC ID
+If IMEI (15-digit) is passed in this field then EAI will truncate the last digit of IMEI and pass it to MeidHex field of NMS.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="brandCode" type="tns:BrandCodeType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Channel that the device will be activated on. Required if accountId is not provided
+Valid values:
+ASW – Assurance Wireless
+BST - Boost
+SPP – Sprint Prepaid
+VMU – Virgin Mobile US
+VEV – Virgin Evolution
+SPR – Sprint Retail postpaid (Default if empty/blank)
+</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="accountId" type="tns:ResellerPartnerIdentifierType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Reseller partner id.
+Required if brandCode is not provided
+</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="QueryCompatibleSimKitInfoResponseType">
+		<xs:sequence>
+			<xs:element name="esnMeidHex" type="tns:DeviceSerialNumberHexType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ESN/Mobile Equipment Identifier(MEID) in hex format. Echoed back from the request</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="esnMeidDec" type="tns:DeviceSerialNumberDecType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ESN/Mobile Equipment Identifier(MEID) in decimal format. Echoed back from the request</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="modelNumber" type="tns:ModelNumberType">
+				<xs:annotation>
+					<xs:documentation>Equipment Model Number.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="simKitList" type="tns:SimKitListType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Structure containing list of Sim Kit Info. Returned if compatible UICCs found for the device</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SimKitInfoType">
+		<xs:sequence>
+			<xs:element name="simKitModel" type="tns:ModelNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Model number of the kit which has the SIM that is compatible with the device.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="simModel" type="tns:ModelNumberType">
+				<xs:annotation>
+					<xs:documentation>Model number of the SIM compatible with the device</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="simPartNumber" type="tns:PartIdentifierType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Part number of the SIM compatible with the device.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="simPriority" type="tns:PriorityLevelType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Priority on the SIM compatible with the device.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SimKitListType">
+		<xs:sequence>
+			<xs:element name="simKitInfo" type="tns:SimKitInfoType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Structure containing sim kit information for SIMs compatible with device</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!---->
+	<!--MVM/Shared Simple Types-->
+	<xs:simpleType name="DeviceSerialNumberType">
+		<xs:annotation>
+			<xs:documentation>Device Serial Number is the value of a electronic serial number OR Mobile Equipment Identifier(MEID)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="8"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BrandCodeType">
+		<xs:annotation>
+			<xs:documentation>Brand Code indicates which brand the subscriber belongs to.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DeviceSerialNumberDecType">
+		<xs:annotation>
+			<xs:documentation>A Device Serial Number Decimal is the value of a electronic serial number OR Mobile Equipment Identifier(MEID) in decimal format.  This type should be used when it is not known what type the serial number is.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="11"/>
+			<xs:maxLength value="18"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DeviceSerialNumberHexType">
+		<xs:annotation>
+			<xs:documentation>A Device Serial Number Hex is the value of a electronic serial number OR Mobile Equipment Identifier(MEID) in hexidecimal format.  This type should be used when it is not known what type the serial number is.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="8"/>
+			<xs:maxLength value="14"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ModelNumberType">
+		<xs:annotation>
+			<xs:documentation>Model Number contains a unique value within the class of PRODUCT identified by Model Name used to identify the type of equipment being shipped by the Manufacturer.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PartIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Part Identifier is an identifier of a particular part used in a particular industry. Its purpose is to simplify reference to that part.(Also referred to as Part Number)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PriorityLevelType">
+		<xs:annotation>
+			<xs:documentation>Priority Level is a unique number that a party assigns to each item in a list of items to designate the importance of each item compared to all other items in the list. The lower the number the higher the importance.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:totalDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ResellerPartnerIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Reseller Partner Identifier is a unique identifier of a reseller partner.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!---->
+</xs:schema>

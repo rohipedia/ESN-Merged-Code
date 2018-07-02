@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 rel. 2 (x64) (http://www.altova.com) by Ibrahim.F.Elkhatib@sprint.com (SPRINT) -->
+<xs:schema xmlns:tns="http://integration.sprint.com/interfaces/validateForeignDevice/v1/validateForeignDevice.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://integration.sprint.com/interfaces/validateForeignDevice/v1/validateForeignDevice.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1">
+	<!-- Date              Author                   Version     Description                                                                                                                        Rel                                   SR# -->
+	<!--02/06/2015   Ibrahim ElKhatib      1.0            Initial Revision                                                                                                                    GBL15.1.0  (3/1 deploy)  PJ009752 CR40 Epic 185-->
+	<!--06/04/2015   Ibrahim ElKhatib      1.1            Added brandCode, skuType to the request, changed partNumber to optional                 GBL15.2.0  PJ009752 CR41 Epic 306-->
+	<!---->
+	<xs:element name="validateForeignDevice" type="tns:ValidateForeignDeviceRequestType"/>
+	<xs:element name="validateForeignDeviceResponse" type="tns:ValidateForeignDeviceResponseType"/>
+	<!---->
+	<xs:complexType name="ValidateForeignDeviceRequestType">
+		<xs:sequence>
+			<xs:element name="deviceInfo" type="tns:DeviceInfoType">
+				<xs:annotation>
+					<xs:documentation>Structure containing choice of esnMeidHex, esnMeidDec or macId </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ValidateForeignDeviceResponseType">
+		<xs:sequence>
+			<xs:element name="esnMeidHex" type="tns:DeviceSerialNumberHexType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ESN/Mobile Equipment Identifier(MEID) in hex format. Echoed back from the request</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="esnMeidDec" type="tns:DeviceSerialNumberDecType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ESN/Mobile Equipment Identifier(MEID) in decimal format. Echoed back from the request</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="availableReasonCode">
+				<xs:annotation>
+					<xs:documentation>The NMS availability reason codes.
+• 200: Device supported by Sprint and can be added to inventory for activation
+• 201: Device available in Sprint inventory for activation with Sprint SKU</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="availableReasonDescription">
+				<xs:annotation>
+					<xs:documentation>The NMS availability reason.
+Valid values:
+• SUCCESS_DEVICE_SUPPORTED TO_BE_ADDED: returned with availableReasonCode 200.
+• SUCCESS_DEVICE_IN_INVENTORY: is returned with availableReasonCode 201</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeviceInfoType">
+		<xs:sequence>
+			<xs:element name="deviceDetailInfo" type="tns:DeviceDetailInfoType">
+				<xs:annotation>
+					<xs:documentation>Structure containing choice of (esnMeidHex, esnMeidDec or macId)  and conditional fields deviceType and iccId</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="partNumber" type="tns:StockKeepingUnitType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Part Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="brandCode" type="tns:BrandCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Valid values:
+BST - Boost
+SPP – Sprint Prepaid
+VMU – Virgin Mobile
+ASW – Assurance Wireless</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="skuType" type="tns:DeviceCategoryNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The device type: Tablet, handset, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeviceDetailInfoType">
+		<xs:choice>
+			<xs:element name="esnMeidHex" type="tns:DeviceSerialNumberHexType">
+				<xs:annotation>
+					<xs:documentation>ESN/Mobile Equipment Identifier(MEID) in hex format
+Required if esnMeidDec or macId are  not provided</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="esnMeidDec" type="tns:DeviceSerialNumberDecType">
+				<xs:annotation>
+					<xs:documentation>ESN/Mobile Equipment Identifier(MEID) in decimal format
+Required if esnMeidHex or macId are not provided</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<!---->
+	<!--MVM/Shared Simple Types-->
+	<xs:simpleType name="BrandCodeType">
+		<xs:annotation>
+			<xs:documentation>Brand Code indicates which brand the subscriber belongs to.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DeviceCategoryNameType">
+		<xs:annotation>
+			<xs:documentation>Device Category Name is a common name for the category of the deivce.
+Valid Values Include:
+handset,
+netbook,
+data card,
+tablet,
+mifi/overdrive...</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DeviceSerialNumberDecType">
+		<xs:annotation>
+			<xs:documentation>A Device Serial Number Decimal is the value of a electronic serial number OR Mobile Equipment Identifier(MEID) in decimal format.  This type should be used when it is not known what type the serial number is.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="11"/>
+			<xs:maxLength value="18"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DeviceSerialNumberHexType">
+		<xs:annotation>
+			<xs:documentation>A Device Serial Number Hex is the value of a electronic serial number OR Mobile Equipment Identifier(MEID) in hexidecimal format.  This type should be used when it is not known what type the serial number is.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="8"/>
+			<xs:maxLength value="14"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SerialNumberNotAvailableReasonCodeType">
+		<xs:annotation>
+			<xs:documentation>Serial Number Not Available Reason Code is a code to identify reason ESN/MEID is not available. 
+1 = Stolen &#13;
+2 = In use &#13;
+3 = Fraudulent &#13;
+4 = Not in DB&#13;
+5 = Account ID is not correct(returned if no PLS account ID is sent in and Phone Owner = ‘PLBL’ or account ID is sent in and Phone Owner =‘SPCS’&#13;
+6 = Pre-paid unprovisionable&#13;
+7 = in use with another MVNO (Valid only for 4G SM cat2 devices)&#13;
+8 =Lost in CLWR (Valid only for 4G SM cat2 devices)&#13;
+9 =Stolen in CLWR (Valid only for 4G SM cat2 devices)&#13;
+10 =Broken in CLWR (Valid only for 4G SM cat2 devices)&#13;
+11 =Blacklisted in CLWR (Valid only for 4G SM cat2 devices)&#13;
+</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="5"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SerialNumberNotAvailableReasonDescriptionType">
+		<xs:annotation>
+			<xs:documentation>Serial Number Not Available Reason Description is text to identify the reason the ESN/MEID is not available for use.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="80"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StockKeepingUnitType">
+		<xs:annotation>
+			<xs:documentation>Stock Keeping Unit represents the Sprint Inventory Stock Keeping Unit (SKU).  Stock Keeping Unit identifies a group of PRODUCT instances.  It could identify a handset Model and Model Number, a Kit or an accessory. Previously length = 18.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!---->
+</xs:schema>

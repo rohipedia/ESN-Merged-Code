@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://integration.sprint.com/interfaces/queryShippingSlaDate/v1/queryShippingSlaDate.xsd" targetNamespace="http://integration.sprint.com/interfaces/queryShippingSlaDate/v1/queryShippingSlaDate.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	
+<!-- Date              Author             Version     Change                                                                                                  Rel                          SR# -->
+	
+<!-- 09/04/2017  Jocelen Silva      1.0  Intial Draft                                                MID17.10.1                MID17.10.1 PJ022389 E349-->
+	
+<!-- 09/04/2017  Steve Heichelheim 1.0  Standardize                                             MID17.10.1                MID17.10.1 PJ022389 E349-->
+	
+<!-- 09/15/2017  Nayanika Dey    1.1  Changed itemId and slaDateInfo within slaInfo structure to optional in the response.     MID17.10.1  PJ022389 E349-->
+	
+<!--09/21/2017  Jocelen Silva     1.2  Changed itemId back to required in the response MID17.10.1  PJ022389 E349-->
+	
+<!---->
+	
+<xs:element name="queryShippingSlaDate" type="tns:QueryShippingSlaDateRequestType"/>
+	
+<xs:element name="queryShippingSlaDateResponse" type="tns:QueryShippingSlaDateResponseType"/>
+	
+<xs:complexType name="QueryShippingSlaDateRequestType">
+		
+<xs:sequence>
+			
+<xs:element name="info" type="tns:InfoType">
+				
+<xs:annotation>
+					
+<xs:documentation>Structure containing information about the SLA retrieval</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="QueryShippingSlaDateResponseType">
+		
+<xs:sequence>
+			
+<xs:element name="slaList" type="tns:SlaListResponseType">
+				
+<xs:annotation>
+					
+<xs:documentation>List of SLA records available.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="ErrorInfoType">
+		
+<xs:sequence>
+			
+<xs:element name="errorCode" type="tns:ErrorMessageIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>Error Code</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="errorText" type="tns:ErrorMessageTextType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Error Text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="InfoType">
+		
+<xs:choice>
+			
+<xs:element name="orderList" type="tns:OrderListType">
+				
+<xs:annotation>
+					
+<xs:documentation>Order List Info</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="slaInfo" type="tns:SlaInfoType">
+				
+<xs:annotation>
+					
+<xs:documentation>Sla Info, if sent EAI will retrieve all rows from the DB matching the orderDateRange and itemId</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	
+<xs:complexType name="OrderDateRangeType">
+		
+<xs:sequence>
+			
+<xs:element name="fromDate" type="tns:EffectiveFromDateTimeType">
+				
+<xs:annotation>
+					
+<xs:documentation>Initial order creation date </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="toDate" type="tns:EffectiveThruDateTimeType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Final order creation date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="OrderInfoType">
+		
+<xs:sequence>
+			
+<xs:element name="lineSequenceNumber" type="tns:OrderLineItemNumberType">
+				
+<xs:annotation>
+					
+<xs:documentation>Order line sequence number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="itemId" type="tns:DeviceItemIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>Device itemId (SKU)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="orderDate" type="tns:OrderDateTimeType">
+				
+<xs:annotation>
+					
+<xs:documentation>Date and time the order was created</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="orderLineTypeCode" type="tns:OrderLineTypeCodeType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>FAST order line type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="OrderListType">
+		
+<xs:sequence>
+			
+<xs:element name="orderInfo" type="tns:OrderInfoType" maxOccurs="100">
+				
+<xs:annotation>
+					
+<xs:documentation>Order Info</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="PaginationInfoResponseType">
+		
+<xs:sequence>
+			
+<xs:element name="currentBlock" type="tns:BlockNumberType">
+				
+<xs:annotation>
+					
+<xs:documentation>Current block of records</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="totalBlocks" type="tns:BlockNumberType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Total number of blocks of records available</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="PaginationInfoType">
+		
+<xs:sequence>
+			
+<xs:element name="blockNumber" type="tns:BlockNumberType">
+				
+<xs:annotation>
+					
+<xs:documentation>Block Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="blockSize" type="tns:BlockSizeType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Block Size                             Default=50</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="SlaDateInfoType">
+		
+<xs:sequence>
+			
+<xs:element name="fromDate" type="tns:ServiceLevelAgreementDateTimeType">
+				
+<xs:annotation>
+					
+<xs:documentation>Initial SLA date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="toDate" type="tns:ServiceLevelAgreementDateTimeType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Final SLA date. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="SlaInfoResponseType">
+		
+<xs:sequence>
+			
+<xs:element name="lineSequenceNumber" type="tns:OrderLineItemNumberType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Order line sequence Number. Returned only when orderlist is received in the request.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="itemId" type="tns:DeviceItemIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>Device itemId (SKU)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="itemIdDescription" type="tns:DeviceItemDescriptionType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>SKU Description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="slaType" type="tns:ServiceLevelAgreementTypeCodeType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Type of SLA:                     
+S - Ship by
+D - Delivery by</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="slaDateInfo" type="tns:SlaDateInfoType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Sla date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="updatedSlaDateInfo" type="tns:SlaDateInfoType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Updated SLA date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="careNote" type="tns:NoteTextType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>User friendly note for Care/Sales</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="customerNote" type="tns:NoteTextType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>User friendly note for Customers</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="errorInfo" type="tns:ErrorInfoType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Error Information. Returned only when no SLA was found for the given orderInfo </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="SlaInfoType">
+		
+<xs:sequence>
+			
+<xs:element name="orderDateRange" type="tns:OrderDateRangeType">
+				
+<xs:annotation>
+					
+<xs:documentation>Order Date Range</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="itemId" type="tns:DeviceItemIdentifierType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Item id (SKU)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="paginationInfo" type="tns:PaginationInfoType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Pagination Info</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="SlaListResponseType">
+		
+<xs:sequence>
+			
+<xs:element name="slaInfo" type="tns:SlaInfoResponseType" maxOccurs="100">
+				
+<xs:annotation>
+					
+<xs:documentation>SLA information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="paginationInfo" type="tns:PaginationInfoResponseType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Pagination Information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<!---->
+	
+<!--Shared Simple Types-->
+	
+<xs:simpleType name="BlockNumberType">
+		
+<xs:annotation>
+			
+<xs:documentation>Block number which will select the nth block of a group of blocks.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:integer">
+			
+<xs:totalDigits value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="BlockSizeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Block Size dictates how many rows of data are fetched during the current call</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:integer">
+			
+<xs:totalDigits value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="DeviceItemDescriptionType">
+		
+<xs:annotation>
+			
+<xs:documentation>Device Item Description is text describing an item of device.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="DeviceItemIdentifierType">
+		
+<xs:annotation>
+			
+<xs:documentation>Device Item Identifier is the item identifier of the device to be ordered should be authorized according to the dealer&#8217;s sales channel. It is equivalent to a handset SKU.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="EffectiveFromDateTimeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Effective From Date holds the first calendar month, day, year, hour, minute, second and fraction of a second a Role, Preference, Assignment, etc. was in effect.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:dateTime"/>
+	</xs:simpleType>
+	
+<xs:simpleType name="EffectiveThruDateTimeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Effective Thru Date Time holds the last calendar day and time the Role, Preference, Assignment, etc. was in effect.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:dateTime"/>
+	</xs:simpleType>
+	
+<xs:simpleType name="ErrorMessageIdentifierType">
+		
+<xs:annotation>
+			
+<xs:documentation>Error Message Identifier uniquely identifies a specific error message from the system that encountered the error.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:integer">
+			
+<xs:totalDigits value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="ErrorMessageTextType">
+		
+<xs:annotation>
+			
+<xs:documentation>Error Message Identifier uniquely identifies a specific error message from the system that encountered the error.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="NoteTextType">
+		
+<xs:annotation>
+			
+<xs:documentation>Note Text is the body of the text in the NOTE.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="1024"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="OrderDateTimeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Order Date Time is the combination of calendar date and time of day on which the order was actually placed.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:dateTime"/>
+	</xs:simpleType>
+	
+<xs:simpleType name="OrderLineItemNumberType">
+		
+<xs:annotation>
+			
+<xs:documentation>Order Line Item Number uniquely identifies an instance of ORDER ITEM within the scope of an ORDER.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:integer">
+			
+<xs:totalDigits value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="OrderLineTypeCodeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Order Line Type Code designates a category for an order line.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="ServiceLevelAgreementDateTimeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Service Level Agreement Date Time is the calendar date and time of day targeted by the service level agreement</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:dateTime"/>
+	</xs:simpleType>
+	
+<xs:simpleType name="ServiceLevelAgreementTypeCodeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Service Level Agreement Type Code designates a category of service level agreement.
+Valid Values:
+S - Ship by 
+D - Delivery by</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	
+<!---->
+</xs:schema>

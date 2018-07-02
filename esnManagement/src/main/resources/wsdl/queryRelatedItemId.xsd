@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Jocelen C Silva (IBM BRASIL INDUSTRIA MAQUINAS) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://integration.sprint.com/interfaces/queryRelatedItemId/v1/queryRelatedItemId.xsd" targetNamespace="http://integration.sprint.com/interfaces/queryRelatedItemId/v1/queryRelatedItemId.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<!-- Date           Author                    Version     Change                                                                                  Rel                          SR# -->
+	<!--12/28/2013   Jocelen Silva          1.0            Initial Draft                                                                            GBL16.1                 PJ012223-->
+	<!--12/28/2013  Steve Heichelheim  1.0            Standardize                                                                           GBL16.1                 PJ012223-->
+	<!---->
+	<xs:element name="queryRelatedItemId" type="tns:QueryRelatedItemIdRequestType"/>
+	<xs:element name="queryRelatedItemIdResponse" type="tns:QueryRelatedItemIdResponseType"/>
+	<xs:complexType name="QueryRelatedItemIdRequestType">
+		<xs:sequence>
+			<xs:element name="userId" type="tns:UserIdentifierType">
+				<xs:annotation>
+					<xs:documentation>The User ID of the client application making the API request.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deviceList" type="tns:DeviceListType">
+				<xs:annotation>
+					<xs:documentation>Structure containing list of devices</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="QueryRelatedItemIdResponseType">
+		<xs:sequence>
+			<xs:element name="deviceList" type="tns:DeviceListResponseType">
+				<xs:annotation>
+					<xs:documentation>Structure containing list of devices</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeviceListType">
+		<xs:sequence>
+			<xs:element name="deviceInfo" type="tns:DeviceInfoType" maxOccurs="25">
+				<xs:annotation>
+					<xs:documentation>Device Information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeviceInfoType">
+		<xs:sequence>
+			<xs:element name="itemId" type="tns:DeviceItemIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Item Identifier
+Device Item Id to be used to search for the related itemId</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeviceListResponseType">
+		<xs:sequence>
+			<xs:element name="deviceInfo" type="tns:DeviceInfoResponseType" maxOccurs="25">
+				<xs:annotation>
+					<xs:documentation>Device Information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeviceInfoResponseType">
+		<xs:sequence>
+			<xs:element name="itemId" type="tns:DeviceItemIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Item Identifier</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="relatedItemId" type="tns:DeviceItemIdentifierType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Related Item Identifier</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="statusMessageInfo" type="tns:ErrorMessageInfoType">
+				<xs:annotation>
+					<xs:documentation>Status Message Structure</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ErrorMessageInfoType">
+		<xs:sequence>
+			<xs:element name="statusCode" type="tns:ExceptionConditionCodeType">
+				<xs:annotation>
+					<xs:documentation>Status / Error code of the request.  StatusCode = 0 for success.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="statusDescription" type="tns:ExceptionMessageType">
+				<xs:annotation>
+					<xs:documentation>Description of Status / Error code.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!---->
+	<!--Shared Simple Types-->
+	<xs:simpleType name="DeviceItemIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Device Item Identifier is the item identifier of the device to be ordered should be authorized according to the dealer’s sales channel. It is equivalent to a handset SKU.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExceptionConditionCodeType">
+		<xs:annotation>
+			<xs:documentation>Exception Condition Code is the provider’s declaration of its success or failure in processing the submitted request.
+Example Values:
+0 - Successful completion, 
+4 - Successful completion, but with a warning as to some unusual circumstance, 
+8 - Error, request was not processed successfully, 
+12 - Severe error, represents a failure that could indicate a major system irregularity</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExceptionMessageType">
+		<xs:annotation>
+			<xs:documentation>Exception Message contains text provided by the responding application providing user-comprehensible error feedback.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UserIdentifierType">
+		<xs:annotation>
+			<xs:documentation>User Identifier represents an identifier of a PARTY used in logging into a computerized system.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!---->
+</xs:schema>

@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://integration.sprint.com/interfaces/queryDeviceDiagnosticsInfo/v1/queryDeviceDiagnosticsInfo.xsd" targetNamespace="http://integration.sprint.com/interfaces/queryDeviceDiagnosticsInfo/v1/queryDeviceDiagnosticsInfo.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	
+<!-- Date              Author             Version     Change                                                                                                  Rel                          SR# -->
+	
+<!--03/14/2017    Jocelen Silva     1.0     Initial Draft                                                              Mid 17.4.1     PJ021698              -->
+	
+<!--03/15/2017   Steve Heichelheim  1.0   Standardize                                                        Mid 17.4.1     PJ021698-->
+	
+<!---->
+	
+<xs:element name="queryDeviceDiagnosticsInfo" type="tns:QueryDeviceDiagnosticsInfoRequestType"/>
+	
+<xs:element name="queryDeviceDiagnosticsInfoResponse" type="tns:QueryDeviceDiagnosticsInfoResponseType"/>
+	
+<xs:complexType name="QueryDeviceDiagnosticsInfoRequestType">
+		
+<xs:sequence>
+			
+<xs:element name="customerId" type="tns:CustomerIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>Customer Id (For Sprint Owned Stores it is the dealer agent code)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="storeId" type="tns:RetailStoreIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>The unique identifier of the store.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="diagnosticsId" type="tns:DiagnosticTestIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>Unique diagnostics transaction ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="QueryDeviceDiagnosticsInfoResponseType">
+		
+<xs:sequence>
+			
+<xs:element name="customerType" type="tns:CustomerTypeCodeType">
+				
+<xs:annotation>
+					
+<xs:documentation>Customer Type			Value: SPTC0S (Sprint Company Owned Stores) </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="customerId" type="tns:CustomerIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>Customer Id (For Sprint Owned Stores it is the dealer agent code)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="storeId" type="tns:RetailStoreIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>The unique identifier of the store.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="diagnosticsId" type="tns:DiagnosticTestIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>Unique diagnostics transaction ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="transactionType" type="tns:EquipmentActivityCodeType">
+				
+<xs:annotation>
+					
+<xs:documentation>Transaction Type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="deviceType" type="tns:DeviceCategoryNameType">
+				
+<xs:annotation>
+					
+<xs:documentation>Device type			Values: Handset / Tablet </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="productId" type="tns:ProductIdentifierType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Unique product identifier in Brightstar system</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="serialNumber" type="tns:DeviceSerialNumberType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Device Serial Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="imei" type="tns:InternationalMobileEquipmentIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>Device IMEI</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="mpn" type="tns:PartIdentifierType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Manufacturer Part Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="manufacturer" type="tns:ManufacturerNameType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Manufacturer Name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="model" type="tns:ModuleNameType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Model Name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="capacity" type="tns:DeviceMemoryQuanityType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Device capacity</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="operatingSystem" type="tns:OperatingSystemNameType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Operatating System (Android / iOS / WP) </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="color" type="tns:ColorNameType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Device Color</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="carrier" type="tns:CarrierNameType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Device carrier</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="promoCode" type="tns:PromotionCodeType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Promotion Code</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="quoteValue" type="tns:MarketValueAmountType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Quote value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="createDate" type="tns:CreationDateTimeType">
+				
+<xs:annotation>
+					
+<xs:documentation>Creation Date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="testResultList" type="tns:TestResultListType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Test Result List</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="questionList" type="tns:QuestionListType">
+				
+<xs:annotation>
+					
+<xs:documentation>List of questions</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="QuestionListType">
+		
+<xs:sequence>
+			
+<xs:element name="questionInfo" type="tns:QuestionInfoType" maxOccurs="unbounded">
+				
+<xs:annotation>
+					
+<xs:documentation>Question Details</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="QuestionInfoType">
+		
+<xs:sequence>
+			
+<xs:element name="questionId" type="tns:QuestionCodeType">
+				
+<xs:annotation>
+					
+<xs:documentation>Id of the question</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="questionText" type="tns:QuestionTextType">
+				
+<xs:annotation>
+					
+<xs:documentation>The question text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="answerId" type="tns:AnswerIdentifierType">
+				
+<xs:annotation>
+					
+<xs:documentation>Answer Id</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="answerText" type="tns:AnswerTextType">
+				
+<xs:annotation>
+					
+<xs:documentation>The answer text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="TestResultListType">
+		
+<xs:sequence>
+			
+<xs:element name="testResultInfo" type="tns:TestResultInfoType" maxOccurs="unbounded">
+				
+<xs:annotation>
+					
+<xs:documentation>Test result details</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<xs:complexType name="TestResultInfoType">
+		
+<xs:sequence>
+			
+<xs:element name="testType" type="tns:DiagnosticTestTypeCodeType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Type of Test (HW)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="testName" type="tns:DiagnosticTestNameType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Name of Test</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			
+<xs:element name="testResult" type="tns:DiagnosticTestResultValueType" minOccurs="0">
+				
+<xs:annotation>
+					
+<xs:documentation>Result of Test</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+<!---->
+	
+<!--Shared Simple Types-->
+	
+<xs:simpleType name="AnswerIdentifierType">
+		
+<xs:annotation>
+			
+<xs:documentation>Answer Identifier is a unique identifier for an answer.  It can reference a fixed answer choice or a freeform answer.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="AnswerTextType">
+		
+<xs:annotation>
+			
+<xs:documentation>Answer Text is text which provides a possible answer to a question. </xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="CustomerIdentifierType">
+		
+<xs:annotation>
+			
+<xs:documentation>Customer Identifier is a type of Party Identifier.  It uniquely identifies those PARTIES Sprint views as either a current purchaser of equipment and services or a potential purchaser of equipment and services.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="CarrierNameType">
+		
+<xs:annotation>
+			
+<xs:documentation>Carrier Name designates the a carrier providing the service.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="ColorNameType">
+		
+<xs:annotation>
+			
+<xs:documentation>Color Name is the common name for a specific color.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="CreationDateTimeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Creation Date Time represents a calendar Month, Day,Year, Hour, Minute, Second and Fraction Of A Second the associated item was created.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:dateTime"/>
+	</xs:simpleType>
+	
+<xs:simpleType name="CustomerTypeCodeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Customer Type Code provides a mechanism for categorizing Customers within the context of various functionalities.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="DeviceCategoryNameType">
+		
+<xs:annotation>
+			
+<xs:documentation>Device Category Name is a common name for the category of the deivce.
+Valid Values Include:
+handset,
+netbook,
+data card,
+tablet,
+mifi/overdrive...</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="DeviceMemoryQuanityType">
+		
+<xs:annotation>
+			
+<xs:documentation>Device Memory Quantity is the amount of memory on a device (usually in gigabytes). </xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="DeviceSerialNumberType">
+		
+<xs:annotation>
+			
+<xs:documentation>Device Serial Number is the value of a electronic serial number (ESN) OR Mobile Equipment Identifier(MEID).  This type should be used when it is not known what type the serial number is.</xs:documentation>
+			
+<xs:documentation>Device Serial Number a unique number that is embedded electronically by the manufacturer into a wireless communication device that identifies that individual unit.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:minLength value="8"/>
+			
+<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="DiagnosticTestIdentifierType">
+		
+<xs:annotation>
+			
+<xs:documentation>Diagnostic Test Identifier uniquely identifies an instance of a diagnostic test.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	
+<xs:simpleType name="DiagnosticTestNameType">
+		
+<xs:annotation>
+			
+<xs:documentation>Diagnostic Test Name is the common name for a diagnostic test.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="DiagnosticTestResultValueType">
+		
+<xs:annotation>
+			
+<xs:documentation>Diagnostic Test Result Value is the value returned from a specific instance of a diagnostic test.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="DiagnosticTestTypeCodeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Diagnostic Test Type Code designates a particular type or category of diagnostic test.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="EquipmentActivityCodeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Equipment Activity Code determines the activity to be performed on the equipment.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="InternationalMobileEquipmentIdentifierType">
+		
+<xs:annotation>
+			
+<xs:documentation>International Mobile Equipment Identifier (IMEI) is an equipment identification number, similar to a serial number, used to identify a wireless network access device.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="ManufacturerNameType">
+		
+<xs:annotation>
+			
+<xs:documentation>Manufacturer Name is the full name of the manufacturer.  </xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="50"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="MarketValueAmountType">
+		
+<xs:annotation>
+			
+<xs:documentation>Market Value Amount is what is a selling price for an item to which a buyer and seller can agree.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:decimal">
+			
+<xs:totalDigits value="18"/>
+			
+<xs:fractionDigits value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="ModuleNameType">
+		
+<xs:annotation>
+			
+<xs:documentation>Module Name is the common name for a module.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="50"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="OperatingSystemNameType">
+		
+<xs:annotation>
+			
+<xs:documentation>Operating System Name is the common name for the software  which manages the basic operations of a computer system or mobile device.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="25"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="PartIdentifierType">
+		
+<xs:annotation>
+			
+<xs:documentation>Part Identifier is an identifier of a particular part used in a particular industry. Its purpose is to simplify reference to that part.(Also referred to as Part Number)</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="25"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="ProductIdentifierType">
+		
+<xs:annotation>
+			
+<xs:documentation>Product Identifier is a code that uniquely idenfies and instance or group of items offered for sale to the Customer.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="25"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="PromotionCodeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Promotion Code uniquely identifies a promotion used to facilitate the sale of products or services.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="QuestionCodeType">
+		
+<xs:annotation>
+			
+<xs:documentation>Question Code uniquely identifies a question.  (an interrogative with an expected answer)</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="QuestionTextType">
+		
+<xs:annotation>
+			
+<xs:documentation>Question Text is text which states an interrogative with an expected answer. </xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<xs:simpleType name="RetailStoreIdentifierType">
+		
+<xs:annotation>
+			
+<xs:documentation>Retail Store Identifer is the store uniquely identifies a retail store.</xs:documentation>
+		</xs:annotation>
+		
+<xs:restriction base="xs:string">
+			
+<xs:maxLength value="25"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+<!---->
+</xs:schema>

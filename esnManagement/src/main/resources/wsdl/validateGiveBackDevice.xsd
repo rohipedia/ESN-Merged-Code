@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 rel. 2 (x64) (http://www.altova.com) by Madhavi.Chadarasipalli@sprint.com (SPRINT) -->
+<xs:schema xmlns:tns="http://integration.sprint.com/interfaces/validateGiveBackDevice/v1/validateGiveBackDevice.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://integration.sprint.com/interfaces/validateGiveBackDevice/v1/validateGiveBackDevice.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.17">
+	<!-- Date              Author                   Version     Change                                                                                                      Rel                    SR#                -->
+	<!--06/16/2014   Subha Kannan      1.0             Initial Version                          MID 14.3.0           PJ012336 EPIC 04 CR007 -->
+	<!--07/03/2014   Kathy Zhao            1.0           Standardization-->
+	<!--07/14/2014   Subha Kannan       1.0          Added new element itemId in the response MID 14.3.0           PJ012336 EPIC 04 CR007 -->
+	<!--07/14/2014   Kathy Zhao            1.0           Standardization-->
+	<!--08/01/2014   Subha Kannan       1.1           Corrected the typo susbcriberId to subscriberId  in the request-->
+	<!--01/30/2015   Ted Burbidge          1.2          PJ012336 Epic 4.3 Added the following response fields deviceCheckInd, appleLockStatusCheckInd, sameLoanModelCheckInd,alternateWelDeviceCheckInd, residualValueCheckInd-->
+	<!--01/30/2015   Adon Powell           1.2           Standardization PJ012336-->
+	<!--01/30/2015   Ted Burbidge          1.3          back out 1.2 and  Added the following response fields validationCheck and validationCheckInd PJ012336 Epic 4.3-->
+	<!--02/03/2015   Adon Powell           1.3           Standardize: add simple types and missing validation complex types and annotations  PJ012336-->
+	<!--06/23/2015   Paula Muller            1.4          Added leaseInfo structure in request with leaseNumber and leaseStatus.  Added leaseGiveBackInfo structure in the response including deviceTurnInCredit and promoCreditAmount.  PJ019964 Epic 176-->
+	<!--06/29/2015  Steve Heichelheim   1.4         Standardize                                                                                                  PJ019964 Epic 176-->
+	<!--06/30/2015   Paula Muller            1.5          Added amtForCustForPurchase, amtForCustForUpgradeTurnIn and amtForCustForStandAloneTurnIn in response of leaseGiveBackInfo structure.  PJ019964 Epic 176-->
+	<!--06/30/2015   Steve Heichelheim 1.5          Standardize                                                                                              PJ019964 Epic 176-->
+	<!--07/01/2015   Paula Muller            1.6          Changed the leaseInfo.leaseNumber from opt to req in the request.  PJ019964 Epic 176-->
+	<!--07/07/2015   Paula Muller            1.7          Added BAN in the request of leaseInfo in the request.  PJ019964 Epic 176-->
+	<!--07/08/2015   Paula Muller            1.8          In leaseInfo in the request - removed leaseStatus and added statusReasonCode .  PJ019964 Epic 176-->
+	<!--07/08/2015   Paula Muller            1.9          In leaseGiveBackInfo in response - added TierNumber.  PJ019964 Epic 176-->
+	<!--07/13/2015   Paula Muller            1.10        In response added deviceCreditAmount for iCare only.  PJ019964 Epic 176-->
+	<!--07/13/2015   Paula Muller            1.11       changed amtForCustForUpgradeTurnIn and amtForCustForStandAloneTurnIn to be amtFromCustForUpgradeTurnIn and amtFromCustForStandAloneTurnIn  PJ019964 Epic 176-->
+	<!--07/13/2015   Paula Muller            1.12       changed leaseInfo.leaseNumber to be leaseInfo.ibLeaseNumber PJ019964 Epic 176-->
+	<!--07/15/2015   Paula Muller            1.13       changed leaseInfo to be ibLeaseInfo. Changed leaseStatusReasonCode to be ibLeaseStatusReasonCode in request. PJ019964 Epic 176-->
+	<!--07/27/2015   Paula Muller            1.14       Added ibLeaseSeqNumber in leaseInfo in request. PJ019964 Epic 176-->
+	<!--08/07/2015   Paula Muller            1.15       Added taxInfo structure and deviceCreditAmountTax  to response PJ019964 Epic 176-->
+	<!--08/10/2015  Steve Heichelheim   1.15    Standardize  (v.12 thru .15)                                                                                  PJ019964 Epic 176-->
+	<!--05/05/2016   Cindy Pummill        1.16       Added deviceConditionCode in  leaseInfo in request  Added resultReasonText and deviceDamageFee in the response. PJ020773 WC4 Epic 717-->
+	<!--05/05/2016  Steve Heichelheim   1.16   Standarize                                                                                          PJ020773 WC4 Epic 717-->
+	<!--05/26/2016  Madhavi Chadarasipalli   1.17  Added optional request element ‘orderType’ to the request    PJ021119 Epic 657-->
+	<!--05/26/2016 Steve Heichelheim       1.17  Standardize                                                                     PJ021119 Epic 657-->
+	<!---->
+	<xs:element name="validateGiveBackDevice" type="tns:ValidateGiveBackDeviceRequestType"/>
+	<xs:element name="validateGiveBackDeviceResponse" type="tns:ValidateGiveBackDeviceResponseType"/>
+	<xs:complexType name="ValidateGiveBackDeviceRequestType">
+		<xs:sequence>
+			<xs:element name="deviceInfo" type="tns:DeviceInfoType">
+				<xs:annotation>
+					<xs:documentation>Structure containing choice of esnMeidHex, esnMeidDec or macId </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="subscriberInfo" type="tns:SubscriberInfoType">
+				<xs:annotation>
+					<xs:documentation>Subscriber Identification info</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ibLeaseInfo" type="tns:LeaseInfoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Info Structure for Lease or IB</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="orderType" type="tns:OrderTypeCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates OrderType
+Values:
+NEW
+ADD_ON
+UPGRADE
+UPGRADE_EARLY
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ValidateGiveBackDeviceResponseType">
+		<xs:sequence>
+			<xs:element name="validGiveBackDeviceInd" type="tns:GiveBackEligibleFlagType">
+				<xs:annotation>
+					<xs:documentation>Result of Give Back validation check, indicates whether Give Back should be processed</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="itemId" type="tns:EquipmentItemIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Indicates the itemId (SKU) for the serialnumber provided in the request.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="validateGiveBackCheckStatusList" type="tns:ValidateGiveBackCheckStatusListType">
+				<xs:annotation>
+					<xs:documentation>List containing validateGiveBackCheckStatusInfo structures.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deviceCreditAmount" type="tns:CreditAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>For iCare only.  This field will be populated for either standalone or upgrade credit amounts.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deviceCreditAmountTax" type="tns:CreditAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>For iCare only.  This field will be populated for either standalone or upgrade credit tax amounts .</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="leaseGiveBackInfo" type="tns:LeaseGiveBackInfoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>lease give back info structure</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="resultReasonText" type="tns:EligibilityStatementTextType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Message text for the validation result.  Will only be returned when validDeviceGiveBackInd is false.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deviceDamageFee" type="tns:ChargeAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The amound of the device damage fee calculated to be charged to the customer.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeviceInfoType">
+		<xs:sequence>
+			<xs:element name="serialNumber">
+				<xs:annotation>
+					<xs:documentation>A valid product serial number. This must consist only of alpha-numeric characters and be at least 5 characters in length</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="tns:EquipmentSerialNumberStringType"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="deviceConditionCode" type="tns:DeviceStatusCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the state of the give-back device.  Valid values include:
+0 - Device is in good shape; default
+1 - Device cannot power on
+2 - LCD screen is damaged</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LeaseGiveBackInfoType">
+		<xs:sequence>
+			<xs:element name="standAloneDeviceTurnInCreditAmount" type="tns:CreditAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the amount the customer would get credited when turning in the device at any phase of the lease</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="upgradeDeviceTurnInCreditAmount" type="tns:CreditAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the credit amount for a targeted customer (promo) turning in the device during an upgrade.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="amtFromCustToPurchase" type="tns:PurchaseOptionAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the amount the customer would pay to purchase the device when they are either in-term, or M2M</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="amtFromCustForUpgradeTurnIn" type="tns:ChargeAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the amount the customer would pay to turn in the device when they are upgrading.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="amtFromCustForStandAloneTurnIn" type="tns:ChargeAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the amount the customer would pay to turn in the device when they are either in-term, or M2M.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tierNumber" type="tns:TierNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the tier number for the type of promo the customer is eligible for.  This will tell the front end if the customer is upgrading or a standalone.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="taxInfo" type="tns:TaxInfoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Tax Info Structure</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LeaseInfoType">
+		<xs:sequence>
+			<xs:element name="ban" type="tns:BillingAccountNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Billing Account Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ibLeaseNumber" type="tns:LeaseIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Indicates the lease number or the IB loan number. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ibLeaseSeqNumber" type="tns:LeaseIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Indicates the lease sequence no or loan sequence number.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ibLeaseStatusReasonCode" type="tns:LeaseStatusReasonCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the reason code for the lease status that changed or the IB loan status reason codes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tierNumber" type="tns:TierNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the tier number for the type of promo the customer is eligible for.  This optional field can be used by the front end for direct ship upgrades with a turn in of device.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SubscriberInfoType">
+		<xs:choice>
+			<xs:element name="mdn" type="tns:MobileDirectoryNumberStringType">
+				<xs:annotation>
+					<xs:documentation>Indicates mdn of the subscriber who is validationg for give back</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="subscriberId" type="tns:SubscriberIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Indicates subscriberId  of the subscriber who is validating the device for give back</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="TaxInfoType">
+		<xs:sequence>
+			<xs:element name="amtFromCustToPurchaseTax" type="tns:TaxAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the tax amount the customer would pay to purchase the device.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="amtFromCustForUpgradeTurnInTax" type="tns:TaxAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the tax amount the customer would pay to turn in the device.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="amtFromCustForStandAloneTurnInTax" type="tns:TaxAmountType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the tax amount the customer would pay to turn in the device.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="taxErrorList" type="tns:TaxErrorListType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Tax Error List Structure</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TaxErrorListType">
+		<xs:sequence>
+			<xs:element name="taxErrorInfo" type="tns:TaxErrorInfoType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>If the calculateEquipmentTax internal call fails, when calculating the tax fields above then we will continue processing the API and map the error codes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TaxErrorInfoType">
+		<xs:sequence>
+			<xs:element name="errorCode" type="tns:ErrorMessageIdentifierType">
+				<xs:annotation>
+					<xs:documentation>provider error code for when the internal tax calculation fails and we continue processing.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="errorText" type="tns:ErrorMessageTextType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>provider error text for when the internal tax calculation fails and we continue processing.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ValidateGiveBackCheckStatusListType">
+		<xs:sequence>
+			<xs:element name="validateGiveBackCheckStatusInfo" type="tns:ValidateGiveBackCheckStatusInfoType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Structure containing give back status information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ValidateGiveBackCheckStatusInfoType">
+		<xs:sequence>
+			<xs:element name="validationCheck" type="tns:ValidationRuleSetIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Indicates type of each validation check.  For example
+deviceCheck
+appleLockStatusCheck
+sameLoanModelCheck
+alternateWelDeviceCheck
+residualValueCheck</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="validationCheckInd" type="tns:ValidationSuccessFlagType">
+				<xs:annotation>
+					<xs:documentation>Indicates the status of the corresponding validation check
+
+deviceCheckInd
+true indicates that device is valid device  ex: not Lost/Stolen and is not already identified as giveback.
+false indicates that device is either lost/stolen,givebackStatus is either pending or surrendered,etc.
+
+appleLockStatusCheckInd
+true indicates that the Apple device is locked.
+false indicates that the Apple device is not locked.
+
+sameLoanModelCheckInd
+true indicates that model being given back is the same model as the subscriber's outstanding loan.
+false indicates that the model being given back is not the same model as the subscriber's outstanding loan.
+
+alternateWelDeviceCheckInd
+true indicates that the model being given back is an acceptable replacement.
+false indicates that the model being given back is not an acceptable replacement.
+
+residualValueCheckInd
+true indicates that the giveback SKU residual value has sufficient value related to the original IB SKU.
+false true indicates that the giveback SKU residual value does not have sufficient value related to the original IB SKU.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!---->
+	<!--    Shared SimpleTypes-->
+	<xs:simpleType name="BillingAccountNumberType">
+		<xs:annotation>
+			<xs:documentation>Billing Account Number uniquely identifies an instance of Billing Account used to accrue charges for invoicing.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:totalDigits value="9"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ChargeAmountType">
+		<xs:annotation>
+			<xs:documentation>Charge Amount is the dollar amount charged for goods or services.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="9"/>
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ConditionFlagType">
+		<xs:annotation>
+			<xs:documentation>Condition Flag is a boolean that indicates the presense of the related condition. 
+Valid Values: 
+true - condition exists, 
+false - condition does not exist</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean"/>
+	</xs:simpleType>
+	<xs:simpleType name="CreditAmountType">
+		<xs:annotation>
+			<xs:documentation>Credit Amount is the monetary amount of a credit applied to a customer's account or bill.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="9"/>
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DeviceStatusCodeType">
+		<xs:annotation>
+			<xs:documentation>Device Status Code uniquely identifies the status of a device.
+Example Values include:
+0 – Device is in good shape
+1 – Device cannot power on
+2 – LCD screen is damaged </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	<xs:simpleType name="EligibilityStatementTextType">
+		<xs:annotation>
+			<xs:documentation>Eligibility Statement Text defines the set of possible eligibility statement text messages. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="200"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EquipmentSerialNumberStringType">
+		<xs:annotation>
+			<xs:documentation>Equipment Serial Number holds the identifier used by the device to communicate (broadcast) its identity to the wireless mobile network.  &#13;
+&#13;
+Network Device Identifier will contain one of the following: &#13;
+Electronic Serial Number (ESN); &#13;
+Mobile Equipment IDentifier (MEID);&#13;
+International Mobile Equipment Identfie (IMEI);&#13;
+Subscriber Identify Module (SIM).</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="8"/>
+			<xs:maxLength value="18"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EquipmentItemIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Equipment Item Identiifer is the item identifier of the equipment to be ordered should be authorized according to the dealer’s sales channel.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ErrorMessageIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Error Message Identifier uniquely identifies a specific error message from the system that encountered the error.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ErrorMessageTextType">
+		<xs:annotation>
+			<xs:documentation>Error Message Identifier uniquely identifies a specific error message from the system that encountered the error.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1024"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExactMatchFlagType">
+		<xs:annotation>
+			<xs:documentation>Exact Match Flag indicates related search will preform an exact match to the data in the request or was an exact match.
+Values:  
+True - Exact Match, 
+False - not Exact Match</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean"/>
+	</xs:simpleType>
+	<xs:simpleType name="GiveBackEligibleFlagType">
+		<xs:annotation>
+			<xs:documentation>Give Back Eligible Flag indicates if the subscriber or device is eligible for give back for upgrade.
+Valid Values: 
+True - eligible for give back for upgrade, 
+False - NOT eligible for give back for upgrade</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean"/>
+	</xs:simpleType>
+	<xs:simpleType name="LeaseIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Lease Identifier uniquely identifies a lease.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LeaseStatusReasonCodeType">
+		<xs:annotation>
+			<xs:documentation>Lease Status Reason Code designates the reason for assigning a status to a particular Lease.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="6"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LockedFlagType">
+		<xs:annotation>
+			<xs:documentation>Locked Flag indicates if an item is Locked.
+valid values:
+True - Locked
+False - not Locked</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean"/>
+	</xs:simpleType>
+	<xs:simpleType name="MobileDirectoryNumberStringType">
+		<xs:annotation>
+			<xs:documentation>Mobile Directory Number (MDN) is the actual phone number one would dial to reach a specific mobile phone.
+Prior to Wireless Number Portability, MDN was the same number as the Mobile Identification Number (MIN) for many mobile phones. But now that MDNs can be ported (moved) to other carriers, MDN and MIN will be different for ported numbers.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="OrderTypeCodeType">
+		<xs:annotation>
+			<xs:documentation>Order Type Code designates the category of the ORDER.
+valid values:
+S - Subsidized
+N - Non Subsidize
+N - New
+U - Upgrade
+NEW
+ADD_ON
+UPGRADE
+REPLACE
+SERVICE_ONLY</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="16"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PurchaseOptionAmountType">
+		<xs:annotation>
+			<xs:documentation>Purchase Option Amount is the monetary amount that the customer may optionally pay at the end of the lease term to purchase the leased items.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="9"/>
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SubscriberIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Subscriber Identifier is a string that uniquely identifies a subscriber.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+			<xs:minLength value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TaxAmountType">
+		<xs:annotation>
+			<xs:documentation>Tax Amount is the monetary amount charged and collected on behalf of a government entity for taxes.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="11"/>
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TierNumberType">
+		<xs:annotation>
+			<xs:documentation>Tier Number designates a specific tier for the rate plan.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="9"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ValidationSuccessFlagType">
+		<xs:annotation>
+			<xs:documentation>Validation Success Flag is a boolean indicator of whether validation succeeded or failed.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean"/>
+	</xs:simpleType>
+	<xs:simpleType name="ValidationRuleSetIdentifierType">
+		<xs:annotation>
+			<xs:documentation>Validation Rule Set Identifier uniquely identifies the valiation or rule set used.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="30"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!---->
+</xs:schema>
