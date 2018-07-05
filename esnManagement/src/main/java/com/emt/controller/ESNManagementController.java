@@ -5,7 +5,9 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import javax.validation.Payload;
 import javax.validation.Valid;
 
 import org.apache.poi.EncryptedDocumentException;
@@ -34,6 +36,7 @@ import com.emt.model.ValidationJob;
 import com.emt.service.EsnValidationService;
 import com.emt.service.ExcelService;
 import com.emt.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -121,9 +124,13 @@ public class ESNManagementController {
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	
-	@PostMapping("/dashboardData/user")
-	public ResponseEntity<?> getDashboardData(@RequestBody User user) {
-		log.info("Fetching tblESNInfo Data on"+ESNConstants.DATE_TIME);		
+	@PostMapping("/dashboardData")
+	public ResponseEntity<?> getDashboardData(@RequestBody Map<String, Object> obj) {
+		log.info("Fetching tblESNInfo Data on"+ESNConstants.DATE_TIME);
+		
+		ObjectMapper mapper = new ObjectMapper(); 
+		User user = mapper.convertValue(obj.get("user"), User.class);
+		
 		List<EsnInfo> esnInfoData = esnValidationService.getDashboardData(user);
 		if (CollectionUtils.isEmpty(esnInfoData)) {
 			log.error("Fetching tblESNInfo Data failed on"+ESNConstants.DATE_TIME);
@@ -138,17 +145,22 @@ public class ESNManagementController {
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	
-	@PostMapping("/claimEsn/{device}/{esnCount}")
-	public ResponseEntity<?> claimEsn(@RequestBody User user, @PathVariable String device, @PathVariable String esnCount) {
+	@PostMapping("/claimEsn")
+	/*public ResponseEntity<?> claimEsn(@RequestBody User user, @PathVariable String device, @PathVariable String esnCount) {*/
+	public ResponseEntity<?> claimEsn(@RequestBody Map<String, Object> obj) {
 		log.info("Claiming ESNs on"+ESNConstants.DATE_TIME);
-		ESNSuccessResponse successResponse = new ESNSuccessResponse();
-		List<EsnInfo> claimEsnData = esnValidationService.claimEsn(user,device,esnCount);
+		
+		ObjectMapper mapper = new ObjectMapper(); 
+		User user = mapper.convertValue(obj.get("user"), User.class);
+		
+		List<EsnInfo> claimEsnData = esnValidationService.claimEsn(user, obj.get("device").toString(),obj.get("esnCount").toString());
 		if (CollectionUtils.isEmpty(claimEsnData)) {
 			log.error("Esn claim failed on"+ESNConstants.DATE_TIME);
 			ErrorDetails errorDetails = new ErrorDetails(new Date(), "Esn claim failed.", "Error");
 			return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 		}
 		log.info("Esn claimed successfully on"+ESNConstants.DATE_TIME);
+		ESNSuccessResponse successResponse = new ESNSuccessResponse();
 		successResponse.setSuccessIndicator("Esn claimed successfully");
 		successResponse.setTimestamp(new Date());
 		successResponse.setData(claimEsnData);
