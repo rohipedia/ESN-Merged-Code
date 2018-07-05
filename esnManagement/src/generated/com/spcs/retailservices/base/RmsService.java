@@ -28,11 +28,11 @@ public class RmsService extends Service {
         URL url = null;
         try {
         	rmsServiceWsdlLocationFieldValue = new File(".").getCanonicalPath()+"\\src\\main\\resources\\wsdl\\RmsService.wsdl";
-            url = new URL(rmsServiceWsdlLocationFieldValue);
+            url = new URL("file:/"+rmsServiceWsdlLocationFieldValue);
         } catch (IOException e) {
             java.util.logging.Logger.getLogger(RmsService.class.getName())
                 .log(java.util.logging.Level.INFO, 
-                     "Can not initialize the default wsdl from {0}", rmsServiceWsdlLocationFieldValue);
+                     "Can not initialize the default wsdl from {0}",rmsServiceWsdlLocationFieldValue);
         }
         WSDL_LOCATION = url;
     }

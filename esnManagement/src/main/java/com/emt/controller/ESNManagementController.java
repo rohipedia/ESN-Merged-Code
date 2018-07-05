@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.emt.common.ESNConstants;
-import com.emt.exception.ApiValidationFailureException;
 import com.emt.exception.ESNSuccessResponse;
 import com.emt.exception.ErrorDetails;
 import com.emt.exception.FileNotFoundException;
@@ -69,18 +68,21 @@ public class ESNManagementController {
 	}
 	
 	@GetMapping(value = "/validateEsn", produces = "application/json; charset=UTF-8")
-	public ResponseEntity<ESNSuccessResponse> validateEsn() {
+	public ResponseEntity<?> validateEsn() {
 		log.info("Validating ESN on"+ESNConstants.DATE_TIME);
 		ESNSuccessResponse successResponse = new ESNSuccessResponse();
 		List<ValidationJob> validationJobData = Collections.emptyList();
 		try{
 			validationJobData = esnValidationService.validateEsn();
 		} catch (Exception e) {
-			log.error("Error occured while validating ESN in controller", e);
+			log.error("Esn validation failed on"+ESNConstants.DATE_TIME);
+			ErrorDetails errorDetails = new ErrorDetails(new Date(), e.getMessage(), "Error");
+			return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 		}
 		if (CollectionUtils.isEmpty(validationJobData)) {
 			log.error("Esn validation failed on"+ESNConstants.DATE_TIME);
-			throw new ApiValidationFailureException("All ESNs in DB at present are consumed. Click on Import Esn to import new ESNs in DB.");
+			ErrorDetails errorDetails = new ErrorDetails(new Date(), "All ESNs in DB at present are consumed. Click on Import Esn to import new ESNs in DB.", "Error");
+			return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 		}
 		log.info("Validate job completed successfully on" +ESNConstants.DATE_TIME);
 		successResponse.setSuccessIndicator("Validate job completed successfully");
