@@ -94,21 +94,6 @@ public class ESNManagementController {
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 
-	/*private List<?> setValidationJobResponse(List<ValidationJob> validationJobData) {
-		
-		List<HashMap<String,String>> responseList = new ArrayList<>();
-		validationJobData.forEach(entry->{
-			HashMap<String,String> responseMap = new HashMap<>();
-			responseMap.put("userName", entry.getUserForActivity().getUserName());
-			responseMap.put("dateForActivity", entry.getDateForActivity().toString());
-			responseMap.put("state", entry.getState().getState());
-			responseMap.put("validEsnCount", String.valueOf(entry.getValidEsnCount()));
-			responseMap.put("totalEsnValidated", String.valueOf(entry.getTotalEsnValidated()));
-			responseList.add(responseMap);
-		});
-		return responseList;
-	}*/
-	
 	@GetMapping("/refresh")
 	public ResponseEntity<?> refreshValidationStatus() {
 		log.info("Refreshing the progress map on"+ESNConstants.DATE_TIME);
@@ -132,7 +117,7 @@ public class ESNManagementController {
 		User user = mapper.convertValue(obj.get("user"), User.class);
 		
 		List<EsnInfo> esnInfoData = esnValidationService.getDashboardData(user);
-		if (CollectionUtils.isEmpty(esnInfoData)) {
+		if (esnInfoData == null) {
 			log.error("Fetching tblESNInfo Data failed on"+ESNConstants.DATE_TIME);
 			ErrorDetails errorDetails = new ErrorDetails(new Date(), "Fetching tblESNInfo Data failed.", "Error");
 			return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
@@ -146,7 +131,6 @@ public class ESNManagementController {
 	}
 	
 	@PostMapping("/claimEsn")
-	/*public ResponseEntity<?> claimEsn(@RequestBody User user, @PathVariable String device, @PathVariable String esnCount) {*/
 	public ResponseEntity<?> claimEsn(@RequestBody Map<String, Object> obj) {
 		log.info("Claiming ESNs on"+ESNConstants.DATE_TIME);
 		
@@ -154,7 +138,7 @@ public class ESNManagementController {
 		User user = mapper.convertValue(obj.get("user"), User.class);
 		
 		List<EsnInfo> claimEsnData = esnValidationService.claimEsn(user, obj.get("device").toString(),obj.get("esnCount").toString());
-		if (CollectionUtils.isEmpty(claimEsnData)) {
+		if (claimEsnData == null) {
 			log.error("Esn claim failed on"+ESNConstants.DATE_TIME);
 			ErrorDetails errorDetails = new ErrorDetails(new Date(), "Esn claim failed.", "Error");
 			return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);

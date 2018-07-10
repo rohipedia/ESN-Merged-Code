@@ -257,7 +257,6 @@ public class EsnValidationService {
 		if (user != null && StringUtils.isNotEmpty(device) && StringUtils.isNotEmpty(esnCount)) {
 			Optional<User> userObj = userRepository.findById(user.getUserId());
 			Optional<BridgeSKU> bridgeSkuObj = bridgeSKURepository.findByDevice(device);
-			
 			if (userObj.get().getIsAdmin() != null && (!userObj.get().getIsAdmin())) {
 				// User
 				assignESNsToUser(userObj, bridgeSkuObj,esnCount);
@@ -268,7 +267,7 @@ public class EsnValidationService {
 				return esnInfoRepository.findAll();
 			}
 		}
-		return Collections.emptyList();
+		return null;
 	}
 
 	private void assignESNsToUser(Optional<User> userObj, Optional<BridgeSKU> bridgeSkuObj, String requestedEsnCount) {
@@ -300,15 +299,14 @@ public class EsnValidationService {
 		if (user != null) {
 			Optional<User> userObj = userRepository.findById(user.getUserId());
 			if (userObj.get().getIsAdmin() != null && (!userObj.get().getIsAdmin())) {
-				Optional<User> userTableOptional = userRepository.findById(userObj.get().getUserId());
-				if (userTableOptional.isPresent()) {
-				return esnInfoRepository.findByUserClaimed(userTableOptional.get());
-				}
+				// User
+				return esnInfoRepository.findByUserClaimed(userObj.get());
 			} else {
+				// Admin
 				return esnInfoRepository.findAll();
 			}
 		}
-		return Collections.emptyList();
+		return null;
 	}
 
 }
