@@ -21,7 +21,7 @@ public interface EsnInfoRepository extends JpaRepository<EsnInfo, Long> {
 	
 	int countBySkuAndUserClaimedIsNull(BridgeSKU sku);
 	
-	//List<EsnInfo> findAllByOrderByUserClaimedAsc();
+	List<EsnInfo> findAllByOrderByUserClaimedAsc();
 	
 	Optional<EsnInfo> findByIsImportedAndEsn18(boolean isImported, Long esn18);
 	

@@ -73,7 +73,7 @@ public class UserService {
 	}
 
 	public User createUser(User user) {
-		log.info("Creating user" +user);
+		log.info("Creating user" +user.getUserName());
 		return userRepository.save(user);
 	}
 

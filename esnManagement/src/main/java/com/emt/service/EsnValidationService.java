@@ -303,7 +303,8 @@ public class EsnValidationService {
 				return esnInfoRepository.findByUserClaimed(userObj.get());
 			} else {
 				// Admin
-				return esnInfoRepository.findAll();
+				//return esnInfoRepository.findAll();
+				return esnInfoRepository.findAllByOrderByUserClaimedAsc();
 			}
 		}
 		return null;

@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Payload;
 import javax.validation.Valid;
 
 import org.apache.poi.EncryptedDocumentException;
@@ -193,22 +192,22 @@ public class ESNManagementController {
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 
-	@PostMapping("/users")
-	public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-		log.info("Creating User record for the user with id"+user);
-		userService.createUser(user);
-		return new ResponseEntity<>(user, HttpStatus.CREATED);
-	}
-
-	@GetMapping("/login/{userName}/{password}")
-	public ResponseEntity<User> validateUser(@PathVariable("userName") String userName, @PathVariable("password") String password) {
+	@PostMapping("/login")
+	public ResponseEntity<User> validateUser(@Valid @RequestBody User user) {
 		log.info("Fetching User record");
-		User user = userService.validateUser(userName,password);
-		if (user == null) {
-			log.error("User with username"+userName+"not found");
+		User validateUserData = userService.validateUser(user.getUserName(),user.getPassword());
+		if (validateUserData == null) {
+			log.error("User with username"+user.getUserName()+"not found");
 			throw new UserNotFoundException("No User found for requested Username and Password.");
 		}
 		return new ResponseEntity<>(user, HttpStatus.OK);
+	}
+	
+	@PostMapping("/registration")
+	public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
+		log.info("Creating User record for the user with id"+user);
+		userService.createUser(user);
+		return new ResponseEntity<>(user, HttpStatus.CREATED);
 	}
 
 }

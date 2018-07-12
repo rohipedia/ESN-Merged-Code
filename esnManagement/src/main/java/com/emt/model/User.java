@@ -43,8 +43,27 @@ public class User {
 	private Boolean isAdmin;
 	
 	private Boolean isActive;
+	
+	@Column(nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
+	private Date dateCreated;
+	
+	private Boolean isResetRequested;
+	
+	private Boolean approveResetRequest;
+	
+	private Date lastLogin;
 
-    @OneToMany(mappedBy = "userForActivity",cascade = CascadeType.ALL,orphanRemoval = true)
+    public Date getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
+	}
+
+	@OneToMany(mappedBy = "userForActivity",cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonBackReference
     private List<ValidationJob> validationJob = new ArrayList<>();
 	
@@ -79,13 +98,6 @@ public class User {
 		this.esnInfo = esnInfo;
 	}
 
-
-	@Column(nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    @CreatedDate
-	private Date dateCreated;
-	private Boolean isResetRequested;
-	private Boolean approveResetRequest;
 	public Long getUserId() {
 		return userId;
 	}
