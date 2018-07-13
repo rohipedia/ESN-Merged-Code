@@ -88,7 +88,7 @@ public class ESNManagementController {
 		}
 		log.info("Validate job completed successfully on" +ESNConstants.DATE_TIME);
 		successResponse.setSuccessIndicator("Validate job completed successfully");
-		successResponse.setData(validationJobData);
+		successResponse.setDataList(validationJobData);
 		successResponse.setTimestamp(new Date());
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
@@ -104,7 +104,7 @@ public class ESNManagementController {
 		}
 		successResponse.setSuccessIndicator("Refresed the progress map successfully");
 		successResponse.setTimestamp(new Date());
-		successResponse.setData(updatedValidationJobList);
+		successResponse.setDataList(updatedValidationJobList);
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	
@@ -115,8 +115,8 @@ public class ESNManagementController {
 		ObjectMapper mapper = new ObjectMapper(); 
 		User user = mapper.convertValue(obj.get("user"), User.class);
 		
-		List<EsnInfo> esnInfoData = esnValidationService.getDashboardData(user);
-		if (esnInfoData == null) {
+		Map<String, Object> esnInfoDataObj = esnValidationService.getDashboardData(user);
+		if (esnInfoDataObj == null) {
 			log.error("Fetching tblESNInfo Data failed on"+ESNConstants.DATE_TIME);
 			ErrorDetails errorDetails = new ErrorDetails(new Date(), "Fetching tblESNInfo Data failed.", "Error");
 			return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
@@ -125,7 +125,7 @@ public class ESNManagementController {
 		ESNSuccessResponse successResponse = new ESNSuccessResponse();
 		successResponse.setSuccessIndicator("tblESNInfo Data fetched successfully");
 		successResponse.setTimestamp(new Date());
-		successResponse.setData(esnInfoData);
+		successResponse.setDataObj(esnInfoDataObj);
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	
@@ -146,7 +146,7 @@ public class ESNManagementController {
 		ESNSuccessResponse successResponse = new ESNSuccessResponse();
 		successResponse.setSuccessIndicator("Esn claimed successfully");
 		successResponse.setTimestamp(new Date());
-		successResponse.setData(claimEsnData);
+		successResponse.setDataList(claimEsnData);
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	

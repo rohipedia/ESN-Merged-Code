@@ -25,6 +25,8 @@ public interface EsnInfoRepository extends JpaRepository<EsnInfo, Long> {
 	
 	Optional<EsnInfo> findByIsImportedAndEsn18(boolean isImported, Long esn18);
 	
+	EsnInfo findTopByOrderByDateImportedDesc();
+	
 	/*@Query("select e from EsnInfo e where e.isImported='0' AND (e.esn18=?1 OR e.esnHEX14=?2)")
 	Optional<EsnInfo> findByIsImported(Long esn18, Long esnHEX14);*/
 	

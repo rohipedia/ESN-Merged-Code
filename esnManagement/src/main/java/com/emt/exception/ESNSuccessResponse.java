@@ -2,6 +2,7 @@ package com.emt.exception;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
@@ -9,16 +10,24 @@ public class ESNSuccessResponse {
 	
 	private String successIndicator;
 	private Date timestamp;
+	Map<String, Object> dataObj;
+	
+	public Map<String, Object> getDataObj() {
+		return dataObj;
+	}
+	public void setDataObj(Map<String, Object> dataObj) {
+		this.dataObj = dataObj;
+	}
 	@JsonUnwrapped
-	private List<?> data;
+	private List<?> dataList;
 	
-	public List<?> getData() {
-		return data;
-	}
-	public void setData(List<?> data) {
-		this.data = data;
-	}
 	
+	public List<?> getDataList() {
+		return dataList;
+	}
+	public void setDataList(List<?> dataList) {
+		this.dataList = dataList;
+	}
 	public String getSuccessIndicator() {
 		return successIndicator;
 	}

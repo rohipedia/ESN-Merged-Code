@@ -2,7 +2,9 @@ package com.emt.service;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -295,16 +297,45 @@ public class EsnValidationService {
 		}
 	}
 
-	public List<EsnInfo> getDashboardData(User user) {
+	public Map<String, Object> getDashboardData(User user) {
 		if (user != null) {
+			Map<String, Object> dashboardDataResultSet = new HashMap<String, Object>();
+			
 			Optional<User> userObj = userRepository.findById(user.getUserId());
 			if (userObj.get().getIsAdmin() != null && (!userObj.get().getIsAdmin())) {
 				// User
-				return esnInfoRepository.findByUserClaimed(userObj.get());
+				List<EsnInfo> data = esnInfoRepository.findByUserClaimed(userObj.get());
+				long validESNs =  data.stream().filter(item -> !item.isConsumed()).count();
+				
+				dashboardDataResultSet.put("totalclaimedESNs", data.size());
+				dashboardDataResultSet.put("validESNs", validESNs);
+				dashboardDataResultSet.put("data", data);				
+				return dashboardDataResultSet;
 			} else {
 				// Admin
-				//return esnInfoRepository.findAll();
-				return esnInfoRepository.findAllByOrderByUserClaimedAsc();
+				List<EsnInfo> data = esnInfoRepository.findAllByOrderByUserClaimedAsc();
+				
+				long totalAvailableValidESNs =  data.stream().filter(item -> !item.isConsumed()).count();
+				
+				Date esnLastImported = esnInfoRepository.findTopByOrderByDateImportedDesc().getDateImported();
+				Date esnLastValidated = validationJobRepository.findTopByOrderByDateForActivityDesc().getDateForActivity();
+				
+				long esnLastPulled = data.stream().filter(item -> item.getDateImported().equals(esnLastImported)).count();
+				
+				List<EsnInfo> loggedInUserData = esnInfoRepository.findByUserClaimed(userObj.get());
+				long validESNs =  loggedInUserData.stream().filter(item -> !item.isConsumed()).count();
+				
+				dashboardDataResultSet.put("totalclaimedESNs", loggedInUserData.size());
+				dashboardDataResultSet.put("validESNs", validESNs);
+				
+				dashboardDataResultSet.put("esnLastImported", esnLastImported);
+				dashboardDataResultSet.put("esnLastValidated", esnLastValidated);
+				
+				dashboardDataResultSet.put("totalESNLastPulled", esnLastPulled);
+				dashboardDataResultSet.put("totalAvailableValidESNs", totalAvailableValidESNs);
+				dashboardDataResultSet.put("data", data);
+				
+				return dashboardDataResultSet;
 			}
 		}
 		return null;
