@@ -298,43 +298,55 @@ public class EsnValidationService {
 	}
 
 	public Map<String, Object> getDashboardData(User user) {
+
 		if (user != null) {
 			Map<String, Object> dashboardDataResultSet = new HashMap<String, Object>();
-			
+
 			Optional<User> userObj = userRepository.findById(user.getUserId());
 			if (userObj.get().getIsAdmin() != null && (!userObj.get().getIsAdmin())) {
 				// User
 				List<EsnInfo> data = esnInfoRepository.findByUserClaimed(userObj.get());
-				long validESNs =  data.stream().filter(item -> !item.isConsumed()).count();
-				
+				long validESNs = data.stream().filter(item -> !item.isConsumed()).count();
 				dashboardDataResultSet.put("totalclaimedESNs", data.size());
 				dashboardDataResultSet.put("validESNs", validESNs);
-				dashboardDataResultSet.put("data", data);				
+				dashboardDataResultSet.put("data", data);
 				return dashboardDataResultSet;
 			} else {
 				// Admin
+				Date esnLastImported = null;
+				Date esnLastValidated = null;
+				long esnLastPulled = 0;
 				List<EsnInfo> data = esnInfoRepository.findAllByOrderByUserClaimedAsc();
-				
-				long totalAvailableValidESNs =  data.stream().filter(item -> !item.isConsumed()).count();
-				
-				Date esnLastImported = esnInfoRepository.findTopByOrderByDateImportedDesc().getDateImported();
-				Date esnLastValidated = validationJobRepository.findTopByOrderByDateForActivityDesc().getDateForActivity();
-				
-				long esnLastPulled = data.stream().filter(item -> item.getDateImported().equals(esnLastImported)).count();
-				
+
+				long totalAvailableValidESNs = data.stream().filter(item -> !item.isConsumed()).count();
+
+				Optional<EsnInfo> esnLastImportedObj = esnInfoRepository.findTopByOrderByDateImportedDesc();
+				if (esnLastImportedObj.isPresent()) {
+					esnLastImported = esnLastImportedObj.get().getDateImported();
+					esnLastPulled = data.stream()
+							.filter(item -> item.getDateImported().equals(esnLastImportedObj.get().getDateImported()))
+							.count();
+				}
+
+				Optional<ValidationJob> esnLastValidatedObj = validationJobRepository
+						.findTopByOrderByDateForActivityDesc();
+				if (esnLastValidatedObj.isPresent()) {
+					esnLastValidated = esnLastValidatedObj.get().getDateForActivity();
+				}
+
 				List<EsnInfo> loggedInUserData = esnInfoRepository.findByUserClaimed(userObj.get());
-				long validESNs =  loggedInUserData.stream().filter(item -> !item.isConsumed()).count();
-				
+				long validESNs = loggedInUserData.stream().filter(item -> !item.isConsumed()).count();
+
 				dashboardDataResultSet.put("totalclaimedESNs", loggedInUserData.size());
 				dashboardDataResultSet.put("validESNs", validESNs);
-				
+
 				dashboardDataResultSet.put("esnLastImported", esnLastImported);
 				dashboardDataResultSet.put("esnLastValidated", esnLastValidated);
-				
+
 				dashboardDataResultSet.put("totalESNLastPulled", esnLastPulled);
 				dashboardDataResultSet.put("totalAvailableValidESNs", totalAvailableValidESNs);
 				dashboardDataResultSet.put("data", data);
-				
+
 				return dashboardDataResultSet;
 			}
 		}

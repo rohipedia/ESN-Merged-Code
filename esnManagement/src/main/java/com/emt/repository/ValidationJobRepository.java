@@ -16,5 +16,5 @@ public interface ValidationJobRepository extends JpaRepository<ValidationJob, Lo
 	Optional<ValidationJob> findByUserForActivity(User userForActivity);
 	Optional<ValidationJob> findOptionalByState(BatchState state);
 	List<ValidationJob> findByState(BatchState state);
-	ValidationJob findTopByOrderByDateForActivityDesc();
+	Optional<ValidationJob> findTopByOrderByDateForActivityDesc();
 }

@@ -200,7 +200,7 @@ public class ESNManagementController {
 			log.error("User with username"+user.getUserName()+"not found");
 			throw new UserNotFoundException("No User found for requested Username and Password.");
 		}
-		return new ResponseEntity<>(user, HttpStatus.OK);
+		return new ResponseEntity<>(validateUserData, HttpStatus.OK);
 	}
 	
 	@PostMapping("/registration")
