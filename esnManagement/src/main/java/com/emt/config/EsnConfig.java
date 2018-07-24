@@ -16,7 +16,7 @@ public class EsnConfig {
     @Bean
     public String rmsServiceWsdlLocationPropertyValue() throws IOException{
         return "file:"+new File(".").getCanonicalPath()+rmsServiceWsdlLocationPropertyValue;
-    }
+    }	
     
 	@Value("${queryDeviceInfoServiceWsdlLocation}")
 	private String queryDeviceInfoServiceWsdlLocationPropertyValue;

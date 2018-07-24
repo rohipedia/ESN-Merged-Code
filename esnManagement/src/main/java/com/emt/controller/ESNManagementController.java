@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/api")
-public class ESNManagementController {
+public class EsnManagementController {
 
 	@Autowired
 	private UserService userService;
@@ -69,13 +69,12 @@ public class ESNManagementController {
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	
-	@GetMapping(value = "/validateEsn", produces = "application/json; charset=UTF-8")
-	public ResponseEntity<?> validateEsn() {
+	@PostMapping(value = "/validateEsn", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<?> validateEsn(@Valid @RequestBody User user) {
 		log.info("Validating ESN on"+ESNConstants.DATE_TIME);
-		ESNSuccessResponse successResponse = new ESNSuccessResponse();
 		List<ValidationJob> validationJobData = Collections.emptyList();
 		try{
-			validationJobData = esnValidationService.validateEsn();
+			validationJobData = esnValidationService.validateEsn(user);
 		} catch (Exception e) {
 			log.error("Esn validation failed on"+ESNConstants.DATE_TIME);
 			ErrorDetails errorDetails = new ErrorDetails(new Date(), e.getMessage(), "Error");
@@ -87,17 +86,18 @@ public class ESNManagementController {
 			return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 		}
 		log.info("Validate job completed successfully on" +ESNConstants.DATE_TIME);
+		ESNSuccessResponse successResponse = new ESNSuccessResponse();
 		successResponse.setSuccessIndicator("Validate job completed successfully");
 		successResponse.setDataList(validationJobData);
 		successResponse.setTimestamp(new Date());
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/refresh")
-	public ResponseEntity<?> refreshValidationStatus() {
+	@GetMapping(value = "/refresh", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<?> refreshEsnValidationStatus() {
 		log.info("Refreshing the progress map on"+ESNConstants.DATE_TIME);
 		ESNSuccessResponse successResponse = new ESNSuccessResponse();
-		List<ValidationJob> updatedValidationJobList = esnValidationService.refreshValidationStatus();
+		List<ValidationJob> updatedValidationJobList = esnValidationService.refreshEsnValidationStatus();
 		if (!CollectionUtils.isEmpty(updatedValidationJobList)) {
 			log.error("No entry found in database");
 			//throw new DataNotFoundException("No Data found in tblValidationJob");
@@ -108,7 +108,23 @@ public class ESNManagementController {
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	
-	@PostMapping("/dashboardData")
+	@GetMapping(value = "/stopValidation", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<?> stopEsnValidation() {
+		log.info("Stopping the ESN Validaiton on"+ESNConstants.DATE_TIME);
+		String result;
+		boolean response = esnValidationService.stopEsnValidation();
+		if (!response) {
+			/*log.error("File not found at the location" +ESNConstants.DATE_TIME);
+			throw new FileNotFoundException("A file does not exists at the specific location");
+		*/}
+		ESNSuccessResponse successResponse = new ESNSuccessResponse();
+		result = (response) ? "success" : "failure";
+		successResponse.setSuccessIndicator(result);
+		successResponse.setTimestamp(new Date());
+		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
+	}
+	
+	@PostMapping(value = "/dashboardData", produces = "application/json; charset=UTF-8")
 	public ResponseEntity<?> getDashboardData(@RequestBody Map<String, Object> obj) {
 		log.info("Fetching tblESNInfo Data on"+ESNConstants.DATE_TIME);
 		
@@ -129,7 +145,7 @@ public class ESNManagementController {
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	
-	@PostMapping("/claimEsn")
+	@PostMapping(value = "/claimEsn", produces = "application/json; charset=UTF-8")
 	public ResponseEntity<?> claimEsn(@RequestBody Map<String, Object> obj) {
 		log.info("Claiming ESNs on"+ESNConstants.DATE_TIME);
 		
@@ -148,6 +164,24 @@ public class ESNManagementController {
 		successResponse.setTimestamp(new Date());
 		successResponse.setDataList(claimEsnData);
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
+	}
+	
+	@PostMapping(value = "/registration", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
+		log.info("Creating User record for the user with id"+user);
+		userService.createUser(user);
+		return new ResponseEntity<>(user, HttpStatus.CREATED);
+	}
+	
+	@PostMapping(value = "/login", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<User> validateUser(@Valid @RequestBody User user) {
+		log.info("Fetching User record");
+		User validateUserData = userService.validateUser(user.getUserName(),user.getPassword());
+		if (validateUserData == null) {
+			log.error("User with username"+user.getUserName()+"not found");
+			throw new UserNotFoundException("No User found for requested Username and Password.");
+		}
+		return new ResponseEntity<>(validateUserData, HttpStatus.OK);
 	}
 	
 	@GetMapping("/users")
@@ -191,23 +225,4 @@ public class ESNManagementController {
 		}
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
-
-	@PostMapping("/login")
-	public ResponseEntity<User> validateUser(@Valid @RequestBody User user) {
-		log.info("Fetching User record");
-		User validateUserData = userService.validateUser(user.getUserName(),user.getPassword());
-		if (validateUserData == null) {
-			log.error("User with username"+user.getUserName()+"not found");
-			throw new UserNotFoundException("No User found for requested Username and Password.");
-		}
-		return new ResponseEntity<>(validateUserData, HttpStatus.OK);
-	}
-	
-	@PostMapping("/registration")
-	public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
-		log.info("Creating User record for the user with id"+user);
-		userService.createUser(user);
-		return new ResponseEntity<>(user, HttpStatus.CREATED);
-	}
-
 }

@@ -43,7 +43,7 @@ public class EsnValidationService {
 
 	@Autowired
 	EsnInfoRepository esnRepository;
-
+	
 	@Autowired
 	ExcelRepository excelRepository;
 
@@ -64,20 +64,23 @@ public class EsnValidationService {
 
 	@Value("${interval}")
 	private int interval;
+	
+	private boolean stopValidationFlag = false;
 
 	/**
 	 * This method fetches all the entries of tblExcelDump and passes it to
-	 * preTypeValidation method. Once entries are populated in tblEsnInfo,
+	 * validEsnInfoEntry method. Once entries are populated in tblEsnInfo,
 	 * esn18/esn14 and SKU values of each entry is passed to the WebServiceUtility
 	 * for checking consumption status of ESN.
+	 * @param user 
 	 */
-	public List<ValidationJob> validateEsn() {
+	public List<ValidationJob> validateEsn(User user) {
 		cleanUpConsumedEsnRecords();
 
 		reallocateUnConsumedEsnRecords();
 
-		List<ExcelDump> excelObj = excelRepository.findAll();
-		preTypeValidation(excelObj);
+		List<ExcelDump> excelDumpList = excelRepository.findAll();
+		validEsnInfoEntry(excelDumpList);
 
 		EsnValidationUtility webServiceUtility = new EsnValidationUtility();
 		List<EsnInfo> esnInfoList = esnRepository.findAllByIsConsumed(false);
@@ -86,33 +89,45 @@ public class EsnValidationService {
 		int validEsnCount = 0;
 		if (CollectionUtils.isNotEmpty(esnInfoList)) {
 			log.info("Running Esn Validation batch job on" + ESNConstants.DATE_TIME);
-			validationJobEntry(totalEsnValidated, validEsnCount, ESNConstants.RUNNING);
+			validationJobEntry(user, totalEsnValidated, validEsnCount, ESNConstants.RUNNING);
 			for (EsnInfo esn : esnInfoList) {
-				if (totalEsnValidated % interval == 0 && totalEsnValidated != 0) {
-					validationJobEntry(totalEsnValidated, validEsnCount, ESNConstants.RUNNING);
-				}
-				try {
-					boolean isConsumed = true;
 
-					if (!Long.toString(esn.getEsn18()).isEmpty()) {
-						isConsumed = webServiceUtility.esnValidation(Long.toString(esn.getEsn18()), esn.getSku());
-						esn.setConsumed(isConsumed);
-					} else if (!Long.toString(esn.getEsnHEX14()).isEmpty()) {
-						isConsumed = webServiceUtility.esnValidation(Long.toString(esn.getEsnHEX14()), esn.getSku());
-						esn.setConsumed(isConsumed);
+				if (!stopValidationFlag) {
+					if (totalEsnValidated % interval == 0 && totalEsnValidated != 0) {
+						validationJobEntry(user, totalEsnValidated, validEsnCount, ESNConstants.RUNNING);
 					}
-					++totalEsnValidated;
-					if (!isConsumed) {
-						++validEsnCount;
+					try {
+						boolean isConsumed = true;
+
+						if (!Long.toString(esn.getEsn18()).isEmpty()) {
+							isConsumed = webServiceUtility.esnValidation(Long.toString(esn.getEsn18()), esn.getSku());
+							esn.setConsumed(isConsumed);
+						} else if (!Long.toString(esn.getEsnHex14()).isEmpty()) {
+							isConsumed = webServiceUtility.esnValidation(Long.toString(esn.getEsnHex14()), esn.getSku());
+							esn.setConsumed(isConsumed);
+						} else {
+							isConsumed = webServiceUtility.esnValidation(Long.toString(esn.getImei15()), esn.getSku());
+							esn.setConsumed(isConsumed);
+						}
+						++totalEsnValidated;
+						if (!isConsumed) {
+							++validEsnCount;
+						}
+						log.info("Updating EsnInfo table for setting isConsumed");
+						esnRepository.save(esn);
+					} catch (Exception e) {
+						log.error("Error occured while validating ESN in service", e);
 					}
-					log.info("Updating EsnInfo table for setting isConsumed");
-					esnRepository.save(esn);
-				} catch (Exception e) {
-					log.error("Error occured while validating ESN in service", e);
 				}
 			}
-			if (esnInfoList.size() == totalEsnValidated) {
-				validationJobEntry(totalEsnValidated, validEsnCount, "Successful");
+			
+			stopValidationFlag = false;
+			if (esnInfoList.size() == totalEsnValidated && !stopValidationFlag) {
+				validationJobEntry(user, totalEsnValidated, validEsnCount, "Successful");
+			} else if(stopValidationFlag) {
+				validationJobEntry(user, totalEsnValidated, validEsnCount, "Stopped");
+			} else {
+				validationJobEntry(user, totalEsnValidated, validEsnCount, "Failed");
 			}
 
 			return validationJobRepository.findAll();
@@ -120,26 +135,25 @@ public class EsnValidationService {
 		return Collections.emptyList();
 	}
 
-	private void validationJobEntry(int totalEsnValidated, int validEsnCount, String status) {
+	private void validationJobEntry(User user, int totalEsnValidated, int validEsnCount, String status) {
 		ValidationJob validationJobObj = null;
 		try {
-			if (totalEsnValidated == 0) {
+			if (totalEsnValidated == 0 && !stopValidationFlag && status.equalsIgnoreCase("Running")) {
 				validationJobObj = new ValidationJob();
 			} else {
-				BatchState batchStateTableObj = null;
-				batchStateTableObj = batchStateRepository.findByState(ESNConstants.RUNNING);
-				if (batchStateTableObj == null) {
+				BatchState batchStateObj = batchStateRepository.findByState(ESNConstants.RUNNING);
+				if (batchStateObj == null) {
 					throw new ApiValidationFailureException(ESNConstants.BATCH_STATE_FAILURE_MESSAGE);
 				}
 
 				Optional<ValidationJob> validationJobOptional = validationJobRepository
-						.findOptionalByState(batchStateTableObj);
+						.findOptionalByState(batchStateObj);
 				if (validationJobOptional.isPresent())
 					validationJobObj = validationJobOptional.get();
 			}
 
 			if (validationJobObj != null) {
-				populateValidationJobObj(validationJobObj, totalEsnValidated, validEsnCount, status);
+				insertValidationJobRecord(user, validationJobObj, totalEsnValidated, validEsnCount, status);
 			}
 		} catch (Exception e) {
 			log.error("Error occured while validationJobEntry entry", e);
@@ -152,25 +166,19 @@ public class EsnValidationService {
 
 			List<ValidationJob> validationJobList = validationJobRepository.findByState(batchStateTableObj);
 			validationJobList.stream()
-					.forEach(entry -> populateValidationJobObj(entry, totalEsnValidated, validEsnCount, "Failed"));
+					.forEach(entry -> insertValidationJobRecord(user, entry, totalEsnValidated, validEsnCount, "Failed"));
 		}
 	}
 
-	private void populateValidationJobObj(ValidationJob validationJobObj, int totalEsnValidated, int validEsnCount,
+	private void insertValidationJobRecord(User user, ValidationJob validationJobObj, int totalEsnValidated, int validEsnCount,
 			String status) {
-		BatchState batchStateTableObj = null;
-
-		batchStateTableObj = batchStateRepository.findByState(status);
+		BatchState batchStateTableObj = batchStateRepository.findByState(status);
 		if (batchStateTableObj == null) {
 			throw new ApiValidationFailureException(ESNConstants.BATCH_STATE_FAILURE_MESSAGE);
 		}
+		validationJobObj.setState(batchStateTableObj);
 
-		if (batchStateTableObj != null)
-			validationJobObj.setState(batchStateTableObj);
-
-		Optional<User> userTableOptional = userRepository.findById((long) 1);// As only 1 entry exists in tblUser for
-																				// "admin" as of now. Later replaced by
-																				// logged in User's ID received from UI.
+		Optional<User> userTableOptional = userRepository.findById(user.getUserId());
 		if (userTableOptional.isPresent())
 			validationJobObj.setUserForActivity(userTableOptional.get());
 
@@ -206,45 +214,48 @@ public class EsnValidationService {
 	/**
 	 * This method performs type validation and conversion of specific String
 	 * fields, prior to populating tblESNInfo data from tblExcelDump data.
-	 * 
+	 * It only fills valid records in the excelInfo table.
 	 * @param excelObj
+	 * 
 	 */
-	private void preTypeValidation(List<ExcelDump> excelObj) {
-		String regex = "\\d+";
-		Pattern pattern = Pattern.compile(regex);
-
-		excelObj.forEach(obj -> {
+	private void validEsnInfoEntry(List<ExcelDump> excelDumpList) {
+		excelDumpList.forEach(excelObj -> {
 			EsnInfo esn = new EsnInfo();
-			if (pattern.matcher(obj.getStoreId()).matches() && pattern.matcher(obj.getEsn18()).matches()
-			/* && pattern.matcher(obj.getEsnHEX14()).matches() */) {
-				esn.setStoreId(Integer.parseInt(obj.getStoreId()));
-				Optional<BridgeSKU> bridgeSKUOptional = bridgeSKURepository.findBySku(obj.getSku());
-				if (bridgeSKUOptional.isPresent()) {
-					esn.setSku(bridgeSKUOptional.get());
-				}
+			esn.setStoreId(Integer.parseInt(excelObj.getStoreId()));
+			esn.setEsn18(typeValidationAndConversion(excelObj.getEsn18()));
+			esn.setEsnHex14(typeValidationAndConversion(excelObj.getEsnHex14()));
+			esn.setImei15(typeValidationAndConversion(excelObj.getImei15()));
+			Optional<BridgeSKU> bridgeSKUOptional = bridgeSKURepository.findBySku(excelObj.getSku());
+			if (bridgeSKUOptional.isPresent()) {
+				esn.setSku(bridgeSKUOptional.get());
+			}
+			esn.setImported(true);
+			esn.setDateImported(excelObj.getDateCreated());
+			esn.setUserClaimed(null);
+			esn.setDateClaimed(null);
+			esn.setUserRequestValidation(null);
+			esn.setDateRequestedValidation(null);
 
-				esn.setEsn18(Long.parseLong(obj.getEsn18()));
-				/*
-				 * esn.setEsnHEX14(Long.parseLong(obj.getEsnHEX14()));
-				 * esn.setImei15(Long.parseLong(obj.getImei15()));
-				 */
-				esn.setImported(true);
-				esn.setDateImported(obj.getDateCreated());
-				esn.setUserClaimed(null);
-				esn.setDateClaimed(null);
-				esn.setUserRequestValidation(null);
-				esn.setDateRequestedValidation(null);
-
-				Optional<EsnInfo> entry = esnRepository.findByIsImportedAndEsn18(true,
-						Long.parseLong(obj.getEsn18()));
-				if (!entry.isPresent()) {
-					esnRepository.save(esn);
-				}
+			Optional<EsnInfo> esn18Entry = esnRepository.findByIsImportedAndEsn18AndEsn18IsNotNull(true,esn.getEsn18());
+			Optional<EsnInfo> esnHex14entry = esnRepository.findByIsImportedAndEsnHex14AndEsnHex14IsNotNull(true,esn.getEsnHex14());
+			Optional<EsnInfo> imei15entry = esnRepository.findByIsImportedAndImei15AndImei15IsNotNull(true,esn.getImei15());
+			if (!esn18Entry.isPresent() && !esnHex14entry.isPresent() && !imei15entry.isPresent()) {
+				esnRepository.save(esn);
 			}
 		});
 	}
 
-	public List<ValidationJob> refreshValidationStatus() {
+	private Long typeValidationAndConversion(String field) {
+		String regex = "\\d+";
+		Pattern pattern = Pattern.compile(regex);
+		
+		if (StringUtils.isNotBlank(field) && pattern.matcher(field).matches()) {
+			return Long.parseLong(field);
+		}
+		return null;
+	}
+
+	public List<ValidationJob> refreshEsnValidationStatus() {
 		log.info("Fetching the updated tblValidationJob data");
 		return validationJobRepository.findAll();
 	}
@@ -351,6 +362,11 @@ public class EsnValidationService {
 			}
 		}
 		return null;
+	}
+
+	public boolean stopEsnValidation() {
+		stopValidationFlag = true;
+		return true;
 	}
 
 }

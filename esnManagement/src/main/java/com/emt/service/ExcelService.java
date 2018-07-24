@@ -15,7 +15,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.emt.common.ESNConstants;
 import com.emt.model.ExcelDump;
-import com.emt.repository.EsnInfoRepository;
 import com.emt.repository.ExcelRepository;
 import com.emt.utilities.ExcelUtility;
 
@@ -29,11 +28,8 @@ public class ExcelService {
 	ExcelRepository excelRepository;
 
 	@Autowired
-	EsnInfoRepository esnRepository;
-	
-	@Autowired
 	ExcelUtility excelUtility;
-
+	
 	public boolean importESN()
 			throws IOException, EncryptedDocumentException, org.apache.poi.openxml4j.exceptions.InvalidFormatException, ParseException {	
 		

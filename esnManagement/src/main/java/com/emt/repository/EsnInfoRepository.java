@@ -23,12 +23,13 @@ public interface EsnInfoRepository extends JpaRepository<EsnInfo, Long> {
 	
 	List<EsnInfo> findAllByOrderByUserClaimedAsc();
 	
-	Optional<EsnInfo> findByIsImportedAndEsn18(boolean isImported, Long esn18);
+	Optional<EsnInfo> findByIsImportedAndEsn18AndEsn18IsNotNull(boolean isImported, Long esn18);
+	
+	Optional<EsnInfo> findByIsImportedAndEsnHex14AndEsnHex14IsNotNull(boolean isImported, Long esnHex14);
+	
+	Optional<EsnInfo> findByIsImportedAndImei15AndImei15IsNotNull(boolean isImported, Long imei15);
 	
 	Optional<EsnInfo> findTopByOrderByDateImportedDesc();
-	
-	/*@Query("select e from EsnInfo e where e.isImported='0' AND (e.esn18=?1 OR e.esnHEX14=?2)")
-	Optional<EsnInfo> findByIsImported(Long esn18, Long esnHEX14);*/
 	
 /*    @Query("delete from EsnInfo e where e.isConsumed='1' AND e.dateImported < NOW() - INTERVAL 30 DAY")
 	public void deleteInvalidRecords();*/

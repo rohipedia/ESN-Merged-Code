@@ -33,9 +33,39 @@ public class EsnInfo {
     @JsonManagedReference
     private BridgeSKU sku;
 	
-	private long esn18;
-	private long esnHEX14;
-	private long imei15;
+	public Long getEsn18() {
+		return esn18;
+	}
+
+	public void setEsn18(Long esn18) {
+		this.esn18 = esn18;
+	}
+
+	public Long getEsnHex14() {
+		return esnHex14;
+	}
+
+	public void setEsnHex14(Long esnHex14) {
+		this.esnHex14 = esnHex14;
+	}
+
+	public Long getImei15() {
+		return imei15;
+	}
+
+	public void setImei15(Long imei15) {
+		this.imei15 = imei15;
+	}
+
+	@Column(nullable = true)
+	private Long esn18;
+	
+	@Column(nullable = true)
+	private Long esnHex14;
+	
+	@Column(nullable = true)
+	private Long imei15;
+	
 	private Date dateRequestedValidation;
 
 	@Column(nullable = true)
@@ -81,14 +111,6 @@ public class EsnInfo {
 		UserRequestValidation = userRequestValidation;
 	}
 
-	public long getImei15() {
-		return imei15;
-	}
-
-	public void setImei15(long imei15) {
-		this.imei15 = imei15;
-	}
-
 	public int getEsnInfoId() {
 		return esnInfoId;
 	}
@@ -105,21 +127,6 @@ public class EsnInfo {
 		this.sku = sku;
 	}
 
-	public long getEsn18() {
-		return esn18;
-	}
-
-	public void setEsn18(long esn18) {
-		this.esn18 = esn18;
-	}
-
-	public long getEsnHEX14() {
-		return esnHEX14;
-	}
-
-	public void setEsnHEX14(long esnHEX14) {
-		this.esnHEX14 = esnHEX14;
-	}
 	
 	public Date getDateRequestedValidation() {
 		return dateRequestedValidation;

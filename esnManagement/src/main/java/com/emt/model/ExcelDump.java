@@ -26,7 +26,7 @@ public class ExcelDump {
 	private String esn18;
 	
 	@Column(length = 20)
-	private String esnHEX14;
+	private String esnHex14;
 	
 	@Column(length = 20)
 	private String imei15;
@@ -57,11 +57,11 @@ public class ExcelDump {
 	public void setSku(String sku) {
 		this.sku = sku;
 	}
-	public String getEsnHEX14() {
-		return esnHEX14;
+	public String getEsnHex14() {
+		return esnHex14;
 	}
-	public void setEsnHEX14(String esnHEX14) {
-		this.esnHEX14 = esnHEX14;
+	public void setEsnHex14(String esnHEX14) {
+		this.esnHex14 = esnHEX14;
 	}
 	public String getImei15() {
 		return imei15;
@@ -72,7 +72,7 @@ public class ExcelDump {
 	@Override
 	public String toString() {
 		return "ExcelDump [excelDumpId=" + excelDumpId + ", storeId=" + storeId + ", sku=" + sku + ", esn18=" + esn18
-				+ ", esnHEX14=" + esnHEX14 + ", imei15=" + imei15 + ", dateCreated=" + dateCreated + "]";
+				+ ", esnHEX14=" + esnHex14 + ", imei15=" + imei15 + ", dateCreated=" + dateCreated + "]";
 	}
 	
 	}

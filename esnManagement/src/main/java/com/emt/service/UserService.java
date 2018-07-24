@@ -1,5 +1,6 @@
 package com.emt.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserService {
 
-	@Autowired
+	@Autowired	
 	UserRepository userRepository;
 
 	/**
@@ -78,10 +79,12 @@ public class UserService {
 	}
 
 	public User validateUser(String userName, String password) {
-		Optional<User> user = userRepository.findByUserNameAndPassword(userName, password);
-		if (user.isPresent()) {
+		Optional<User> userOpt = userRepository.findByUserNameAndPassword(userName, password);
+		if (userOpt.isPresent()) {
+			User user = userOpt.get();
+			user.setLastLogin(new Date());
 			log.info("Fetching User having UserName"+userName);
-			return user.get();
+			return userRepository.save(user);
 		}
 		log.info("Failed to fetch user having username"+userName);
 		return null;
