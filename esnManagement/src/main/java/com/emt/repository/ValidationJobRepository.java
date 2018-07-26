@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.emt.model.BatchState;
-import com.emt.model.EsnInfo;
 import com.emt.model.User;
 import com.emt.model.ValidationJob;
 

@@ -1,5 +1,6 @@
 package com.emt.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -97,7 +98,7 @@ public class EsnValidationService {
 						validationJobEntry(user, totalEsnValidated, validEsnCount, ESNConstants.RUNNING);
 					}
 					try {
-						boolean isConsumed = true;
+						boolean isConsumed;
 
 						if (!Long.toString(esn.getEsn18()).isEmpty()) {
 							isConsumed = webServiceUtility.esnValidation(Long.toString(esn.getEsn18()), esn.getSku());
@@ -113,10 +114,10 @@ public class EsnValidationService {
 						if (!isConsumed) {
 							++validEsnCount;
 						}
-						log.info("Updating EsnInfo table for setting isConsumed");
+						log.info("Updating EsnInfo table for setting isConsumed of esn" +esn);
 						esnRepository.save(esn);
 					} catch (Exception e) {
-						log.error("Error occured while validating ESN in service", e);
+						log.error("Error occured while validating ESN " + esn + " in service", e);
 					}
 				}
 			}
@@ -220,27 +221,29 @@ public class EsnValidationService {
 	 */
 	private void validEsnInfoEntry(List<ExcelDump> excelDumpList) {
 		excelDumpList.forEach(excelObj -> {
-			EsnInfo esn = new EsnInfo();
-			esn.setStoreId(Integer.parseInt(excelObj.getStoreId()));
-			esn.setEsn18(typeValidationAndConversion(excelObj.getEsn18()));
-			esn.setEsnHex14(typeValidationAndConversion(excelObj.getEsnHex14()));
-			esn.setImei15(typeValidationAndConversion(excelObj.getImei15()));
+			EsnInfo esnInfoObj = new EsnInfo();
 			Optional<BridgeSKU> bridgeSKUOptional = bridgeSKURepository.findBySku(excelObj.getSku());
 			if (bridgeSKUOptional.isPresent()) {
-				esn.setSku(bridgeSKUOptional.get());
+				esnInfoObj.setSku(bridgeSKUOptional.get());
+			} else {
+				throw new ApiValidationFailureException("SKU "+excelObj.getSku()+" not found in tblBridgeSKU. Verify Imported SKUs before triggering ESN Validation");
 			}
-			esn.setImported(true);
-			esn.setDateImported(excelObj.getDateCreated());
-			esn.setUserClaimed(null);
-			esn.setDateClaimed(null);
-			esn.setUserRequestValidation(null);
-			esn.setDateRequestedValidation(null);
+			esnInfoObj.setStoreId(Integer.parseInt(excelObj.getStoreId()));
+			esnInfoObj.setEsn18(typeValidationAndConversion(excelObj.getEsn18()));
+			esnInfoObj.setEsnHex14(typeValidationAndConversion(excelObj.getEsnHex14()));
+			esnInfoObj.setImei15(typeValidationAndConversion(excelObj.getImei15()));
+			esnInfoObj.setImported(true);
+			esnInfoObj.setDateImported(excelObj.getDateCreated());
+			esnInfoObj.setUserClaimed(null);
+			esnInfoObj.setDateClaimed(null);
+			esnInfoObj.setUserRequestValidation(null);
+			esnInfoObj.setDateRequestedValidation(null);
 
-			Optional<EsnInfo> esn18Entry = esnRepository.findByIsImportedAndEsn18AndEsn18IsNotNull(true,esn.getEsn18());
-			Optional<EsnInfo> esnHex14entry = esnRepository.findByIsImportedAndEsnHex14AndEsnHex14IsNotNull(true,esn.getEsnHex14());
-			Optional<EsnInfo> imei15entry = esnRepository.findByIsImportedAndImei15AndImei15IsNotNull(true,esn.getImei15());
-			if (!esn18Entry.isPresent() && !esnHex14entry.isPresent() && !imei15entry.isPresent()) {
-				esnRepository.save(esn);
+			Optional<EsnInfo> esn18Entry = esnRepository.findByIsImportedAndEsn18AndEsn18IsNotNull(true,esnInfoObj.getEsn18());
+			Optional<EsnInfo> esnHex14Entry = esnRepository.findByIsImportedAndEsnHex14AndEsnHex14IsNotNull(true,esnInfoObj.getEsnHex14());
+			Optional<EsnInfo> imei15Entry = esnRepository.findByIsImportedAndImei15AndImei15IsNotNull(true,esnInfoObj.getImei15());
+			if (!esn18Entry.isPresent() && !esnHex14Entry.isPresent() && !imei15Entry.isPresent()) {
+				esnRepository.save(esnInfoObj);
 			}
 		});
 	}
@@ -266,99 +269,105 @@ public class EsnValidationService {
 	 * @param id
 	 * @return boolean
 	 */
-	public List<EsnInfo> claimEsn(User user, String device, String esnCount) {
-		if (user != null && StringUtils.isNotEmpty(device) && StringUtils.isNotEmpty(esnCount)) {
+	public List<EsnInfo> claimEsn(User user, String sku, String esnCount) {
+		if (user != null && StringUtils.isNotEmpty(sku) && StringUtils.isNotEmpty(esnCount)) {
 			Optional<User> userObj = userRepository.findById(user.getUserId());
-			Optional<BridgeSKU> bridgeSkuObj = bridgeSKURepository.findByDevice(device);
-			if (userObj.get().getIsAdmin() != null && (!userObj.get().getIsAdmin())) {
-				// User
-				assignESNsToUser(userObj, bridgeSkuObj,esnCount);
-				return esnInfoRepository.findByUserClaimed(userObj.get());
-			} else {
-				// Admin
-				assignESNsToUser(userObj, bridgeSkuObj,esnCount);
-				return esnInfoRepository.findAll();
+			Optional<BridgeSKU> bridgeSkuObj = bridgeSKURepository.findBySku(sku);
+			if(userObj.isPresent() && bridgeSkuObj.isPresent()) {
+				if (userObj.get().getIsAdmin() != null && (!userObj.get().getIsAdmin())) {
+					// User
+					assignESNsToUser(userObj.get(), bridgeSkuObj.get(),esnCount);
+					return esnInfoRepository.findByUserClaimed(userObj.get());
+				} else if (userObj.get().getIsAdmin() != null && (userObj.get().getIsAdmin())) {
+					// Admin
+					assignESNsToUser(userObj.get(), bridgeSkuObj.get(),esnCount);
+					return esnInfoRepository.findAllByOrderByUserClaimedAsc();
+				}
 			}
 		}
 		return null;
 	}
 
-	private void assignESNsToUser(Optional<User> userObj, Optional<BridgeSKU> bridgeSkuObj, String requestedEsnCount) {
-		if (bridgeSkuObj.isPresent()) {
-			Pageable count = new PageRequest(0, Integer.parseInt(requestedEsnCount), Direction.ASC, "sku");
-			int availableEsnCount = esnInfoRepository.countBySkuAndUserClaimedIsNull(bridgeSkuObj.get());
-			if(Integer.parseInt(requestedEsnCount) <= availableEsnCount){
-				List<EsnInfo> claimableEsnInfoList = esnInfoRepository.findBySkuAndUserClaimedIsNull(bridgeSkuObj.get(), count);
-				if (CollectionUtils.isNotEmpty(claimableEsnInfoList)) {
-					claimableEsnInfoList.stream().forEach(item -> {
-						if (userObj.isPresent()) {
-							item.setUserClaimed(userObj.get());
-						}
-						item.setDateClaimed(new Date());
-						esnRepository.save(item);
-					});
-				}
+	private void assignESNsToUser(User user, BridgeSKU bridgeSKU, String requestedEsnCount) {
+		Pageable count = new PageRequest(0, Integer.parseInt(requestedEsnCount), Direction.ASC, "sku");
+		int availableEsnCount = esnInfoRepository.countBySkuAndUserClaimedIsNull(bridgeSKU);
+		if (Integer.parseInt(requestedEsnCount) <= availableEsnCount) {
+			List<EsnInfo> claimableEsnInfoList = esnInfoRepository.findBySkuAndUserClaimedIsNull(bridgeSKU, count);
+			if (CollectionUtils.isNotEmpty(claimableEsnInfoList)) {
+				claimableEsnInfoList.stream().forEach(item -> {
+					item.setUserClaimed(user);
+					item.setDateClaimed(new Date());
+					esnRepository.save(item);
+				});
 			}
-			else {
-				throw new ApiValidationFailureException(
-						"Not enough ESNs available for this Device. Requested Esn Count : " + requestedEsnCount + "."
-								+ " Available Esn Count : "+availableEsnCount);
-			}
-			
+		} else {
+			throw new ApiValidationFailureException("Not enough ESNs available for this Device. Requested Esn Count : "
+					+ requestedEsnCount + "." + " Available Esn Count : " + availableEsnCount);
 		}
 	}
 
 	public Map<String, Object> getDashboardData(User user) {
 
 		if (user != null) {
-			Map<String, Object> dashboardDataResultSet = new HashMap<String, Object>();
+			Map<String, Object> dashboardDataResultSet = new HashMap<>();
 
 			Optional<User> userObj = userRepository.findById(user.getUserId());
-			if (userObj.get().getIsAdmin() != null && (!userObj.get().getIsAdmin())) {
-				// User
-				List<EsnInfo> data = esnInfoRepository.findByUserClaimed(userObj.get());
-				long validESNs = data.stream().filter(item -> !item.isConsumed()).count();
-				dashboardDataResultSet.put("totalclaimedESNs", data.size());
-				dashboardDataResultSet.put("validESNs", validESNs);
-				dashboardDataResultSet.put("data", data);
-				return dashboardDataResultSet;
-			} else {
-				// Admin
-				Date esnLastImported = null;
-				Date esnLastValidated = null;
-				long esnLastPulled = 0;
-				List<EsnInfo> data = esnInfoRepository.findAllByOrderByUserClaimedAsc();
+			if(userObj.isPresent()) {
+				if (userObj.get().getIsAdmin() != null && (!userObj.get().getIsAdmin())) {
+					// User
+					List<EsnInfo> gridData = esnInfoRepository.findByUserClaimed(userObj.get());
+					dashboardDataResultSet.put("userName", userObj.get().getUserName());
+					dashboardDataResultSet.put("lastLogin", userObj.get().getLastLogin());
+					dashboardDataResultSet.put("totalClaimedESNs", gridData.size());
+					long validESNsOutOfClaimed = gridData.stream().filter(item -> !item.isConsumed()).count();
+					dashboardDataResultSet.put("validESNsOutOfClaimed", validESNsOutOfClaimed);
+					List<BridgeSKU> bridgeSkuList = bridgeSKURepository.findAll();
+					dashboardDataResultSet.put("deviceData", bridgeSkuList);
+					dashboardDataResultSet.put("data", gridData);
+					return dashboardDataResultSet;
+				} else if (userObj.get().getIsAdmin() != null && (userObj.get().getIsAdmin())) {
+					// Admin
+					Date esnLastImportedDate = null;
+					Date esnLastValidatedDate = null;
+					long esnLastPulled = 0;
+					List<EsnInfo> gridData = esnInfoRepository.findAllByOrderByUserClaimedAsc();
 
-				long totalAvailableValidESNs = data.stream().filter(item -> !item.isConsumed()).count();
+					dashboardDataResultSet.put("userName", userObj.get().getUserName());
+					dashboardDataResultSet.put("lastLogin", userObj.get().getLastLogin());
 
-				Optional<EsnInfo> esnLastImportedObj = esnInfoRepository.findTopByOrderByDateImportedDesc();
-				if (esnLastImportedObj.isPresent()) {
-					esnLastImported = esnLastImportedObj.get().getDateImported();
-					esnLastPulled = data.stream()
-							.filter(item -> item.getDateImported().equals(esnLastImportedObj.get().getDateImported()))
-							.count();
+					List<EsnInfo> loggedInUserData = esnInfoRepository.findByUserClaimed(userObj.get());
+					dashboardDataResultSet.put("totalClaimedESNs", loggedInUserData.size());
+
+					long validESNsOutOfClaimed = loggedInUserData.stream().filter(item -> !item.isConsumed()).count();
+					dashboardDataResultSet.put("validESNsOutOfClaimed", validESNsOutOfClaimed);
+
+					Optional<EsnInfo> esnLastImportedObj = esnInfoRepository.findTopByOrderByDateImportedDesc();
+					if (esnLastImportedObj.isPresent()) {
+						esnLastImportedDate = esnLastImportedObj.get().getDateImported();
+						esnLastPulled = gridData.stream().filter(
+								item -> item.getDateImported().equals(esnLastImportedObj.get().getDateImported()))
+								.count();
+					}
+					dashboardDataResultSet.put("esnLastImportedDate", esnLastImportedDate);
+					dashboardDataResultSet.put("totalESNLastPulled", esnLastPulled);
+
+					Optional<ValidationJob> esnLastValidatedObj = validationJobRepository
+							.findTopByOrderByDateForActivityDesc();
+					if (esnLastValidatedObj.isPresent()) {
+						esnLastValidatedDate = esnLastValidatedObj.get().getDateForActivity();
+					}
+					dashboardDataResultSet.put("esnLastValidatedDate", esnLastValidatedDate);
+
+					long totalAvailableValidESNs = gridData.stream().filter(item -> !item.isConsumed()).count();
+					dashboardDataResultSet.put("totalAvailableValidESNs", totalAvailableValidESNs);
+					
+					List<BridgeSKU> bridgeSkuList = bridgeSKURepository.findAll();
+					dashboardDataResultSet.put("deviceData", bridgeSkuList);
+					
+					dashboardDataResultSet.put("data", gridData);
+
+					return dashboardDataResultSet;
 				}
-
-				Optional<ValidationJob> esnLastValidatedObj = validationJobRepository
-						.findTopByOrderByDateForActivityDesc();
-				if (esnLastValidatedObj.isPresent()) {
-					esnLastValidated = esnLastValidatedObj.get().getDateForActivity();
-				}
-
-				List<EsnInfo> loggedInUserData = esnInfoRepository.findByUserClaimed(userObj.get());
-				long validESNs = loggedInUserData.stream().filter(item -> !item.isConsumed()).count();
-
-				dashboardDataResultSet.put("totalclaimedESNs", loggedInUserData.size());
-				dashboardDataResultSet.put("validESNs", validESNs);
-
-				dashboardDataResultSet.put("esnLastImported", esnLastImported);
-				dashboardDataResultSet.put("esnLastValidated", esnLastValidated);
-
-				dashboardDataResultSet.put("totalESNLastPulled", esnLastPulled);
-				dashboardDataResultSet.put("totalAvailableValidESNs", totalAvailableValidESNs);
-				dashboardDataResultSet.put("data", data);
-
-				return dashboardDataResultSet;
 			}
 		}
 		return null;

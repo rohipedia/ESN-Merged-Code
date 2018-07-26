@@ -40,8 +40,10 @@ public class User {
 	
 	private String password;
 	
+	@Column(columnDefinition="bit(1) default 0")
 	private Boolean isAdmin;
 	
+	@Column(columnDefinition="bit(1) default 1")
 	private Boolean isActive;
 	
 	@Column(nullable = false, updatable = false)

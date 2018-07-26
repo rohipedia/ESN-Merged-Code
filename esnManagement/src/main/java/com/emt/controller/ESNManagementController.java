@@ -152,7 +152,7 @@ public class EsnManagementController {
 		ObjectMapper mapper = new ObjectMapper(); 
 		User user = mapper.convertValue(obj.get("user"), User.class);
 		
-		List<EsnInfo> claimEsnData = esnValidationService.claimEsn(user, obj.get("device").toString(),obj.get("esnCount").toString());
+		List<EsnInfo> claimEsnData = esnValidationService.claimEsn(user, obj.get("sku").toString(),obj.get("esnCount").toString());
 		if (claimEsnData == null) {
 			log.error("Esn claim failed on"+ESNConstants.DATE_TIME);
 			ErrorDetails errorDetails = new ErrorDetails(new Date(), "Esn claim failed.", "Error");
@@ -166,7 +166,7 @@ public class EsnManagementController {
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	
-	@PostMapping(value = "/registration", produces = "application/json; charset=UTF-8")
+	@PostMapping(value = "/addUser", produces = "application/json; charset=UTF-8")
 	public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
 		log.info("Creating User record for the user with id"+user);
 		userService.createUser(user);
@@ -179,9 +179,16 @@ public class EsnManagementController {
 		User validateUserData = userService.validateUser(user.getUserName(),user.getPassword());
 		if (validateUserData == null) {
 			log.error("User with username"+user.getUserName()+"not found");
-			throw new UserNotFoundException("No User found for requested Username and Password.");
+			throw new UserNotFoundException("There was an error with your UserName/Password combination. Please try again.");
 		}
 		return new ResponseEntity<>(validateUserData, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/forgotPassword", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<User> resetPassword(@Valid @RequestBody User user) {
+		//log.info("Creating User record for the user with id"+user);
+		userService.resetPassword(user);
+		return new ResponseEntity<>(user, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/users")

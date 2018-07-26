@@ -71,17 +71,18 @@ public class EsnValidationUtility {
 				int productId = queryProductDetailInformation(bridgeSKU);
 				isEsnConsumed = validateSerialNumber(preferredSerialNumber, productId);
 			}
+			
+			if (isEsnConsumed != 1) {
+				log.info("ESN" +esn+ " is not consumed");
+				return false;
+			} else {
+				log.info("ESN" +esn+ " is consumed");
+				return true;
+			}
 		} catch (Faultmessage2 e) {
-			log.error("Error occured while validating ESN in utility", e);
+			log.error("Error occured while validating ESN " +esn+ " in utility", e);
 		}
-		
-		if (isEsnConsumed != 1) {
-			log.info("ESN is not consumed");
-			return false;
-		} else {
-			log.info("ESN is consumed");
-			return true;
-		}
+		return false;
 	}
 
 	/**
@@ -147,10 +148,10 @@ public class EsnValidationUtility {
 		ValidateDeviceV11ResponseType validateDeviceV11ResponseType = queryDeviceInfoPortType
 				.validateDeviceV11(validateDeviceV11RequestType);
 		if (ESNConstants.VALIDATION_MESSAGE.equalsIgnoreCase(validateDeviceV11ResponseType.getValidationMessage())) {
-			log.info("ValidateDeviceV11 EAI Service successful and ESN is valid" + validateDeviceV11ResponseType.getValidationMessage());
+			log.info("ValidateDeviceV11 EAI Service successful and ESN "+ esn +" is valid" + validateDeviceV11ResponseType.getValidationMessage());
 			return validateDeviceV11ResponseType.getPreferredSerialNumber();
 		} else {
-			log.info("ValidateDeviceV11 EAI Service successful and ESN is invalid"+ validateDeviceV11ResponseType.getValidationMessage());
+			log.info("ValidateDeviceV11 EAI Service successful and ESN "+ esn +" is invalid"+ validateDeviceV11ResponseType.getValidationMessage());
 			return StringUtils.EMPTY;
 		}
 	}

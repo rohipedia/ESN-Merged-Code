@@ -4,12 +4,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.emt.model.User;
 import com.emt.repository.UserRepository;
 import com.emt.common.ESNConstants;
+import com.emt.exception.UserAldreadyExistsException;
+import com.emt.exception.UserNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,19 +78,33 @@ public class UserService {
 	}
 
 	public User createUser(User user) {
-		log.info("Creating user" +user.getUserName());
-		return userRepository.save(user);
+		log.info("Creating user" + user.getUserName());
+		Optional<User> existingUser = userRepository.findByUserNameIgnoreCase(user.getUserName());
+		if (!existingUser.isPresent()) {
+			user.setDateCreated(new Date());
+			return userRepository.save(user);
+		} else {
+			log.info(user.getUserName()+" username aldready exists.");
+			throw new UserAldreadyExistsException(user.getUserName()+" username aldready exists. Kindly register with different username.");
+		}
 	}
 
 	public User validateUser(String userName, String password) {
-		Optional<User> userOpt = userRepository.findByUserNameAndPassword(userName, password);
-		if (userOpt.isPresent()) {
-			User user = userOpt.get();
+		Optional<User> userObj = userRepository.findByUserNameAndPassword(userName, password);
+		if (userObj.isPresent()) {
+			User user = userObj.get();
 			user.setLastLogin(new Date());
 			log.info("Fetching User having UserName"+userName);
 			return userRepository.save(user);
+		} else {
+			log.info("Failed to fetch user having username"+userName);
+			return null;
 		}
-		log.info("Failed to fetch user having username"+userName);
-		return null;
+	}
+
+	public void resetPassword(@Valid User user) {
+		/*
+		 * { "isResetRequested": null, "approveResetRequest": null, }
+		 */
 	}
 }
