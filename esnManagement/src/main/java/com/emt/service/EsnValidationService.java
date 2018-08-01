@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -40,11 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class EsnValidationService {
-
-	@Autowired
-	EsnInfoRepository esnRepository;
-	
+public class EsnValidationService {	
 	@Autowired
 	ExcelRepository excelRepository;
 
@@ -84,7 +82,7 @@ public class EsnValidationService {
 		validEsnInfoEntry(excelDumpList);
 
 		EsnValidationUtility webServiceUtility = new EsnValidationUtility();
-		List<EsnInfo> esnInfoList = esnRepository.findAllByIsConsumed(false);
+		List<EsnInfo> esnInfoList = esnInfoRepository.findAllByIsConsumed(false);
 
 		int totalEsnValidated = 0;
 		int validEsnCount = 0;
@@ -115,7 +113,7 @@ public class EsnValidationService {
 							++validEsnCount;
 						}
 						log.info("Updating EsnInfo table for setting isConsumed of esn" +esn);
-						esnRepository.save(esn);
+						esnInfoRepository.save(esn);
 					} catch (Exception e) {
 						log.error("Error occured while validating ESN " + esn + " in service", e);
 					}
@@ -194,7 +192,7 @@ public class EsnValidationService {
 	 * data from dump to esnInfo.
 	 */
 	private void cleanUpConsumedEsnRecords() {
-		esnRepository.findAllByIsConsumed(true).removeIf(item -> (Days
+		esnInfoRepository.findAllByIsConsumed(true).removeIf(item -> (Days
 				.daysBetween(new DateTime(item.getDateImported()), new DateTime()).isGreaterThan(Days.days(30))));
 	}
 
@@ -203,7 +201,7 @@ public class EsnValidationService {
 	 * consumed it.
 	 */
 	private void reallocateUnConsumedEsnRecords() {
-		esnRepository
+		esnInfoRepository
 				.findAllByIsConsumed(false).stream().filter(item -> (Days
 						.daysBetween(new DateTime(item.getDateClaimed()), new DateTime()).isGreaterThan(Days.days(2))))
 				.forEach(item -> {
@@ -239,11 +237,11 @@ public class EsnValidationService {
 			esnInfoObj.setUserRequestValidation(null);
 			esnInfoObj.setDateRequestedValidation(null);
 
-			Optional<EsnInfo> esn18Entry = esnRepository.findByIsImportedAndEsn18AndEsn18IsNotNull(true,esnInfoObj.getEsn18());
-			Optional<EsnInfo> esnHex14Entry = esnRepository.findByIsImportedAndEsnHex14AndEsnHex14IsNotNull(true,esnInfoObj.getEsnHex14());
-			Optional<EsnInfo> imei15Entry = esnRepository.findByIsImportedAndImei15AndImei15IsNotNull(true,esnInfoObj.getImei15());
+			Optional<EsnInfo> esn18Entry = esnInfoRepository.findByIsImportedAndEsn18AndEsn18IsNotNull(true,esnInfoObj.getEsn18());
+			Optional<EsnInfo> esnHex14Entry = esnInfoRepository.findByIsImportedAndEsnHex14AndEsnHex14IsNotNull(true,esnInfoObj.getEsnHex14());
+			Optional<EsnInfo> imei15Entry = esnInfoRepository.findByIsImportedAndImei15AndImei15IsNotNull(true,esnInfoObj.getImei15());
 			if (!esn18Entry.isPresent() && !esnHex14Entry.isPresent() && !imei15Entry.isPresent()) {
-				esnRepository.save(esnInfoObj);
+				esnInfoRepository.save(esnInfoObj);
 			}
 		});
 	}
@@ -281,7 +279,7 @@ public class EsnValidationService {
 				} else if (userObj.get().getIsAdmin() != null && (userObj.get().getIsAdmin())) {
 					// Admin
 					assignESNsToUser(userObj.get(), bridgeSkuObj.get(),esnCount);
-					return esnInfoRepository.findAllByOrderByUserClaimedAsc();
+					return placeLoggedInUserDataFirst(esnInfoRepository.findAllByOrderByUserClaimedAsc(), userObj.get().getUserId());
 				}
 			}
 		}
@@ -297,7 +295,7 @@ public class EsnValidationService {
 				claimableEsnInfoList.stream().forEach(item -> {
 					item.setUserClaimed(user);
 					item.setDateClaimed(new Date());
-					esnRepository.save(item);
+					esnInfoRepository.save(item);
 				});
 			}
 		} else {
@@ -364,13 +362,25 @@ public class EsnValidationService {
 					List<BridgeSKU> bridgeSkuList = bridgeSKURepository.findAll();
 					dashboardDataResultSet.put("deviceData", bridgeSkuList);
 					
-					dashboardDataResultSet.put("data", gridData);
-
+					dashboardDataResultSet.put("data", placeLoggedInUserDataFirst(gridData, userObj.get().getUserId()));
+					
 					return dashboardDataResultSet;
 				}
 			}
 		}
 		return null;
+	}
+
+	private List<EsnInfo> placeLoggedInUserDataFirst(List<EsnInfo> gridDataList, Long userId) {
+		List<EsnInfo> sortedGridDataList = new ArrayList<>();
+		Predicate<EsnInfo> predicate = item -> item.getUserClaimed() != null && item.getUserClaimed().getUserId().equals(userId);
+        List<EsnInfo> loggedInUserGridDataList = gridDataList.stream().filter(predicate).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(loggedInUserGridDataList)) {
+        	sortedGridDataList.addAll(loggedInUserGridDataList);
+        	gridDataList.removeIf(predicate);
+        	sortedGridDataList.addAll(gridDataList);
+        }
+		return sortedGridDataList;
 	}
 
 	public boolean stopEsnValidation() {

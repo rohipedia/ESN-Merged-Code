@@ -93,7 +93,7 @@ public class ESNManagementController {
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 
-	@GetMapping(value = "/refresh", produces = "application/json; charset=UTF-8")
+	@GetMapping(value = "/refreshEsnValidation", produces = "application/json; charset=UTF-8")
 	public ResponseEntity<?> refreshEsnValidationStatus() {
 		log.info("Refreshing the progress map on"+ESNConstants.DATE_TIME);
 		ESNSuccessResponse successResponse = new ESNSuccessResponse();
@@ -108,7 +108,7 @@ public class ESNManagementController {
 		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
 	}
 	
-	@GetMapping(value = "/stopValidation", produces = "application/json; charset=UTF-8")
+	@GetMapping(value = "/stopEsnValidation", produces = "application/json; charset=UTF-8")
 	public ResponseEntity<?> stopEsnValidation() {
 		log.info("Stopping the ESN Validaiton on"+ESNConstants.DATE_TIME);
 		String result;
