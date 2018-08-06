@@ -304,7 +304,7 @@ public class EsnValidationService {
 		}
 	}
 
-	public Map<String, Object> getDashboardData(User user) {
+	public Map<String, Object> setDashboardData(User user) {
 
 		if (user != null) {
 			Map<String, Object> dashboardDataResultSet = new HashMap<>();

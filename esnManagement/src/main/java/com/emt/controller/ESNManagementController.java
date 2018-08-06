@@ -125,13 +125,13 @@ public class ESNManagementController {
 	}
 	
 	@PostMapping(value = "/dashboardData", produces = "application/json; charset=UTF-8")
-	public ResponseEntity<?> getDashboardData(@RequestBody Map<String, Object> obj) {
+	public ResponseEntity<?> setDashboardData(@RequestBody Map<String, Object> obj) {
 		log.info("Fetching tblESNInfo Data on"+ESNConstants.DATE_TIME);
 		
 		ObjectMapper mapper = new ObjectMapper(); 
 		User user = mapper.convertValue(obj.get("user"), User.class);
 		
-		Map<String, Object> esnInfoDataObj = esnValidationService.getDashboardData(user);
+		Map<String, Object> esnInfoDataObj = esnValidationService.setDashboardData(user);
 		if (esnInfoDataObj == null) {
 			log.error("Fetching tblESNInfo Data failed on"+ESNConstants.DATE_TIME);
 			ErrorDetails errorDetails = new ErrorDetails(new Date(), "Fetching tblESNInfo Data failed.", "Error");
@@ -191,6 +191,45 @@ public class ESNManagementController {
 		return new ResponseEntity<>(user, HttpStatus.CREATED);
 	}
 	
+	@PostMapping(value = "/fetchEsnUsers", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<?> getDashboardData(@RequestBody Map<String, Object> obj) {
+		log.info("Fetching tblESNInfo Data on"+ESNConstants.DATE_TIME);
+		
+		ObjectMapper mapper = new ObjectMapper(); 
+		User user = mapper.convertValue(obj.get("user"), User.class);
+		
+		List<User> userList = userService.fetchEsnUsers(user);
+		
+		if (CollectionUtils.isEmpty(userList)) {
+			log.error("Fetching adminData failed on"+ESNConstants.DATE_TIME);
+			ErrorDetails errorDetails = new ErrorDetails(new Date(), "Fetching adminData failed.", "Error");
+			return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+		}
+		log.info("tblESNInfo Data successfully fetched on"+ESNConstants.DATE_TIME);
+		ESNSuccessResponse successResponse = new ESNSuccessResponse();
+		successResponse.setSuccessIndicator("adminDataObj fetched successfully");
+		successResponse.setTimestamp(new Date());
+		successResponse.setDataList(userList);
+		return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
+	}
+	
+	@PostMapping(value = "/manageEsnUsers", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<User> updateUser(@RequestBody Map<String, Object> obj) {
+		log.info("Updating User record for the user with id");
+		ObjectMapper mapper = new ObjectMapper(); 
+		User user = mapper.convertValue(obj.get("user"), User.class);
+		user = userService.manageEsnUsers(user);
+		if (null == user) {
+			log.error("User with id"+user.getUserId() +"not found");
+			throw new UserNotFoundException("No Users found for ID.");
+		}
+		log.info("Updated the User record for the user with id"+user.getUserId()+ ESNConstants.DATE_TIME);
+		ESNSuccessResponse successResponse = new ESNSuccessResponse();
+		successResponse.setSuccessIndicator("User record updated sucessfully");
+		successResponse.setTimestamp(new Date());
+		return new ResponseEntity<>(user, HttpStatus.OK);
+	}
+	
 	@GetMapping("/users")
 	public ResponseEntity<?> getUsers() {
 		List<User> users = userService.getUsers();
@@ -212,7 +251,7 @@ public class ESNManagementController {
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 
-	@DeleteMapping("users/{id}")
+	/*@DeleteMapping("users/{id}")
 	public ResponseEntity<User> deleteUser(@PathVariable("id") Long id) {
 		log.info("Deleting User record for the user having id"+id);
 		if (null == userService.deleteUser(id)) {
@@ -220,9 +259,9 @@ public class ESNManagementController {
 			throw new UserNotFoundException("No User found for id"+id);
 		}
 		return ResponseEntity.ok().build();
-	}
+	}*/
 
-	@PutMapping("users/{id}")
+	/*@PutMapping("users/{id}")
 	public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @Valid @RequestBody User user) {
 		log.info("Updating User record for the user with id"+id);
 		user = userService.updateUser(id, user);
@@ -231,5 +270,5 @@ public class ESNManagementController {
 			throw new UserNotFoundException("No Users found for ID.");
 		}
 		return new ResponseEntity<>(user, HttpStatus.OK);
-	}
+	}*/
 }

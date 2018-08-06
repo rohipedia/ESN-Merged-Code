@@ -2,6 +2,7 @@ package com.emt.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -106,5 +107,25 @@ public class UserService {
 		/*
 		 * { "isResetRequested": null, "approveResetRequest": null, }
 		 */
+	}
+
+	public List<User> fetchEsnUsers(User user) {
+		if (user != null) {
+			Optional<User> userObj = userRepository.findById(user.getUserId());
+			if(userObj.isPresent()) {
+				return userRepository.findAll();
+			}
+		}
+		return null;
+	}
+
+	public User manageEsnUsers(User updatedUserDetails) {
+		if (updatedUserDetails != null) {
+			Optional<User> userObj = userRepository.findById(updatedUserDetails.getUserId());
+			if(userObj.isPresent()) {
+				return userRepository.save(updatedUserDetails);
+			}
+		}
+		return null;
 	}
 }
